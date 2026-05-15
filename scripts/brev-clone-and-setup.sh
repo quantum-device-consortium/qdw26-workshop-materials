@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_url="${QDW_REPO_URL:-git@github.com:shanto268/qdw-workshop-materials.git}"
+repo_url="${QDW_REPO_URL:-git@github.com:quantum-device-consortium/qdw-workshop-materials.git}"
 repo_dir="${QDW_REPO_DIR:-$HOME/qdw-workshop-materials}"
 
 mkdir -p "$HOME/.ssh"
