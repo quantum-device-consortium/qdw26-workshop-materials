@@ -1,6 +1,19 @@
 services:
   dev:
-    build: .
+    # The base image abhishekchak52/palace_env:latest is amd64-only. On Apple
+    # Silicon (M1/M2/M3/M4 Macs) Docker would fall back to QEMU emulation but
+    # without an explicit platform, uv inside the container detects the HOST
+    # arch (arm64) and tries to install arm64 Python into an amd64 environment
+    # — extract fails silently and the build dies with "Python interpreter not
+    # found at /root/.local/share/uv/python/cpython-3.12-linux-aarch64-gnu/...".
+    # Pinning platform: linux/amd64 makes everything consistent under QEMU.
+    # Apple Silicon users get a ~2-3x slowdown vs native; Linux/Windows/Intel
+    # Mac users are unaffected.
+    platform: linux/amd64
+    build:
+      context: .
+      platforms:
+        - linux/amd64
     image: ghcr.io/quantum-device-consortium/qdw-workshop-materials:main
     working_dir: /home/ubuntu/qdw-workshop-materials
     volumes:
