@@ -47,28 +47,32 @@ RUN apt-get update && apt-get install -y \
 COPY --from=ghcr.io/astral-sh/uv:0.11.2 /uv /uvx /bin/
 
 ENV UV_LINK_MODE=copy
-# Put uv-managed Pythons in a shared location both root (build-time) and
-# ubuntu (runtime, via the USER directive at the bottom) can read.
-# ``UV_PYTHON_INSTALL_DIR`` is honoured by ``uv sync`` for the python lookup,
-# AND uv sync will install Python here itself if it's missing — so we don't
-# need a separate ``uv python install`` step.
 ENV UV_PYTHON_INSTALL_DIR=/opt/uv-python
+# Force uv sync to download missing Pythons (default in some versions but
+# explicit here so behaviour is the same across uv minor versions).
+ENV UV_PYTHON_DOWNLOADS=automatic
+
+# Ensure the install dir exists + is writable BEFORE uv tries to use it.
+# Without this, uv 0.11.x silently falls back to its user default
+# (/root/.local/share/uv/python) while ``uv sync`` still looks at
+# /opt/uv-python — producing the install/lookup mismatch.
+RUN mkdir -p /opt/uv-python && chmod 755 /opt/uv-python
 
 WORKDIR /home/ubuntu/qdw-workshop-materials
 
-# Single step: sync installs both Python (if missing) AND project deps.
-# We previously had a separate ``uv python install`` step but uv 0.11.x
-# disagrees with itself about where that step puts Python vs where the
-# subsequent ``uv sync`` looks for it (both ``UV_PYTHON_INSTALL_DIR`` env
-# var and ``--install-dir`` flag were ignored by ``uv python install``,
-# producing "Python interpreter not found at /opt/uv-python/...").
-# Letting ``uv sync`` do the install in the same invocation as the lookup
-# guarantees the two stay in agreement.
+# Single step: sync installs Python (via UV_PYTHON_DOWNLOADS=automatic)
+# AND project deps. Doing both in one ``uv`` invocation guarantees that
+# the install location and the lookup location agree.
 RUN --mount=type=cache,target=/home/ubuntu/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=.python-version,target=.python-version \
-    uv sync --locked --no-install-project
+    set -e ; \
+    echo "=== /opt/uv-python before sync ==="; \
+    ls -la /opt/uv-python; \
+    uv sync --locked --no-install-project ; \
+    echo "=== /opt/uv-python after sync ==="; \
+    ls -la /opt/uv-python
 
 # Copy workshop materials after dependency installation so dependency layers stay cacheable.
 COPY --chown=ubuntu:ubuntu . /home/ubuntu/qdw-workshop-materials
