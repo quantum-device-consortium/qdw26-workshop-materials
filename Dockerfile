@@ -61,7 +61,7 @@ RUN --mount=type=cache,target=/home/ubuntu/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=.python-version,target=.python-version \
-    uv python install 3.12 \
+    uv python install --install-dir /opt/uv-python 3.12 \
  && uv sync --locked --no-install-project
 
 # Copy workshop materials after dependency installation so dependency layers stay cacheable.
