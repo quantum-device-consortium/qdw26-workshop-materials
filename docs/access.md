@@ -7,10 +7,12 @@ The attendee environment should be usable from several entry points. None of the
 Use JupyterLab for notebook-first workshops:
 
 ```bash
-docker compose exec dev uv run jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
+docker compose -f compose.deploy.yaml exec dev uv run jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
 ```
 
 Open the URL printed by JupyterLab.
+
+The compose files bind port `8888` to localhost by default. Use Brev's authenticated access or an SSH tunnel for remote access unless the deployment owner intentionally sets `QDW_JUPYTER_BIND=0.0.0.0`.
 
 ## VS Code Or Cursor
 
@@ -26,9 +28,15 @@ Use SSH on Brev or another remote host when terminal access is the most direct r
 
 ```bash
 cd qdw-workshop-materials
-docker compose up -d
-docker compose exec dev bash
+docker compose -f compose.deploy.yaml up -d
+docker compose -f compose.deploy.yaml exec dev bash
 ```
+
+## GUI Applications
+
+GUI applications are optional and need a display server on the attendee's local machine. Use `pvpython`, `pvbatch`, notebooks, or terminal workflows when possible; use GUI forwarding only when a desktop window is actually needed.
+
+See [GUI forwarding](gui-forwarding.md) for macOS, Linux, Windows, and remote-host setup notes.
 
 ## Local Terminal
 
@@ -131,7 +139,7 @@ class cannot work here. The workshop notebooks (`transmon_resonator.ipynb`,
 `qubit_qubit_coupling.ipynb`) were originally written for a local install
 with a display.
 
-**Two paths forward, in order of effort:**
+**Three paths forward, in order of effort:**
 
 1. **(Recommended)** Use the headless viewer instead. Anywhere you see:
    ```python
@@ -146,7 +154,14 @@ with a display.
    Same render path that GDS export uses — what you see is what you fab.
    Works in Docker, Brev, Codespaces, any non-Qt environment.
 
-2. Run the workshop **outside Docker** on a machine with a display. Install
+2. Set up GUI forwarding to your laptop's display server (XQuartz on macOS,
+   native X11 on Linux, VcXsrv/X410 on Windows). See [gui-forwarding.md](gui-forwarding.md)
+   for the full setup. Once forwarding is connected, launch the notebook
+   server with `DISPLAY` passed through and `MetalGUI(design)` will open
+   a real Qt window on your laptop. Best for workshop leads who want the
+   full interactive GUI without leaving Docker.
+
+3. Run the workshop **outside Docker** on a machine with a display. Install
    the dependencies locally:
    ```bash
    pip install 'quantum-metal[full]' sqdmetal

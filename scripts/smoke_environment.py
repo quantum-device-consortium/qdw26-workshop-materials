@@ -41,6 +41,11 @@ def main() -> int:
     run(["palace", "--version"])
     require_command("gmsh")
     run(["gmsh", "--version"])
+    require_command("paraview")
+    require_command("pvpython")
+    run(["pvpython", "--version"])
+    require_command("pvbatch")
+    run(["pvbatch", "--version"])
     require_module("qiskit_metal")
     require_module("SQDMetal", "sqdmetal")
 

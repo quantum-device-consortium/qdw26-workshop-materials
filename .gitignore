@@ -15,3 +15,17 @@ wheels/
 *.log
 todo.md
 attendee-instructions.md
+
+# Local credentials and machine-specific deployment settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+*.token
+*.secret
+token.*
+secret.*
+secrets.*

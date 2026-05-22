@@ -5,6 +5,7 @@ FROM abhishekchak52/palace_env:latest
 RUN apt-get update && apt-get install -y \
 	git \
     gmsh \
+	paraview \
 	libdbus-1-3 \
 	libdrm2 \
 	libegl1 \

@@ -19,7 +19,7 @@ services:
     volumes:
       - .:/home/ubuntu/qdw-workshop-materials
     ports:
-      - "8888:8888"
+      - "${QDW_JUPYTER_BIND:-127.0.0.1}:8888:8888"
     environment:
       QISKIT_METAL_HEADLESS: "1"
     command: ["sh", "-c", "uv sync --locked && exec sleep infinity"]
