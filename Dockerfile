@@ -51,13 +51,18 @@ ENV UV_PYTHON_INSTALL_DIR=/opt/uv-python
 
 WORKDIR /home/ubuntu/qdw-workshop-materials
 
-RUN uv python install 3.12
-
-# Install dependencies
+# Python install + dependency sync in a SINGLE RUN so the python uv installs
+# (under UV_PYTHON_INSTALL_DIR) is visible to the immediately-following sync.
+# Previously these were two separate RUN steps with a cache-mount on step 2,
+# which wiped uv's index of installed pythons between steps and produced
+# "Python interpreter not found at /opt/uv-python/cpython-3.12.X-..." even
+# though step 1 had just installed it.
 RUN --mount=type=cache,target=/home/ubuntu/.cache/uv \
---mount=type=bind,source=uv.lock,target=uv.lock \
---mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-uv sync --locked --no-install-project
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=.python-version,target=.python-version \
+    uv python install 3.12 \
+ && uv sync --locked --no-install-project
 
 # Copy workshop materials after dependency installation so dependency layers stay cacheable.
 COPY --chown=ubuntu:ubuntu . /home/ubuntu/qdw-workshop-materials
