@@ -10,6 +10,8 @@ The repository root defines the environment used by all workshops.
 - `compose.yaml`: local development runtime that can build from source.
 - `compose.deploy.yaml`: Brev/attendee runtime that pulls the published GHCR image.
 
+Core system tools include Palace, Gmsh, and ParaView. Headless checks use ParaView's `pvpython` and `pvbatch` commands; the `paraview` GUI executable is available when users connect with a compatible display environment.
+
 ## Dependency Policy
 
 Workshop leads declare requested dependencies in their `workshop.yaml`. Maintainers update the shared root environment so attendees use one consistent setup.
