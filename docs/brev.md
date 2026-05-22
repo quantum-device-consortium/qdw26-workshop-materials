@@ -32,7 +32,7 @@ The Brev instance may need two read-only credentials:
 - GitHub repository access for cloning this private repository.
 - GHCR package access for pulling the private image, if the package is not public.
 
-Recommended repository access is a read-only deploy key scoped only to this repository. A fine-grained GitHub token can also work, but it should be limited to repository read access and package read access.
+Recommended repository access is a read-only deploy key scoped only to this repository. A fine-grained GitHub token can also work for repository cloning, but it should be limited to repository read access.
 
 Do not put long-lived credentials in notebooks, committed files, shell history, or attendee-facing docs.
 
@@ -44,7 +44,7 @@ For GHCR, `scripts/brev-setup.sh` supports these environment variables:
 
 ```bash
 GHCR_USERNAME=<github-username>
-GHCR_TOKEN=<fine-grained-token-with-package-read>
+GHCR_TOKEN=<classic-token-with-read-packages>
 ```
 
 If those are not set, the script assumes Docker is already authenticated or the image is public.

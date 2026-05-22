@@ -13,10 +13,9 @@ This repository is intended for a private workshop environment where attendees u
 
 Use a read-only deploy key for Brev to clone this private repository. Scope the deploy key only to this repository and do not reuse it elsewhere.
 
-A fine-grained GitHub token can be used for testing, but it should be time-limited and restricted to the minimum required permissions:
+A fine-grained GitHub token can be used for repository-clone testing, but it should be time-limited and restricted to the minimum required permissions:
 
 - Repository contents: read-only for this repository.
-- Packages: read-only if the GHCR package is private.
 
 Do not commit tokens, private SSH keys, `.env` files, license files, or generated Docker auth files.
 
@@ -24,7 +23,7 @@ Local-only planning notes and local credential files are ignored by both Git and
 
 ## GHCR Access
 
-If the workshop image is private, Brev needs package read access to pull it. Prefer a short-lived fine-grained token or a Brev secret mechanism if available.
+If the workshop image is private, Brev needs package read access to pull it. GitHub currently documents GHCR Docker authentication outside GitHub Actions with a personal access token classic that has `read:packages`. Prefer a short-lived token and a Brev secret mechanism if available.
 
 `scripts/brev-setup.sh` accepts `GHCR_USERNAME` and `GHCR_TOKEN` for image pulls. When those variables are used, the script writes Docker auth to a temporary Docker config directory and removes it before exiting. This avoids leaving package credentials in the Brev user's normal Docker configuration.
 
