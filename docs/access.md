@@ -118,6 +118,46 @@ docker compose up -d --force-recreate
 # then open http://localhost:8889/?token=...
 ```
 
+### `MetalGUI(design)` fails with "could not connect to display" / `xcb` errors
+
+```
+WARNING: could not connect to display
+WARNING: xcb-cursor0 or libxcb-cursor0 is needed to load the Qt xcb platform plugin
+INFO: Could not load the Qt platform plugin "xcb"
+```
+
+The Docker container has **no X server / display** — the Qt-based `MetalGUI`
+class cannot work here. The workshop notebooks (`transmon_resonator.ipynb`,
+`qubit_qubit_coupling.ipynb`) were originally written for a local install
+with a display.
+
+**Two paths forward, in order of effort:**
+
+1. **(Recommended)** Use the headless viewer instead. Anywhere you see:
+   ```python
+   gui = MetalGUI(design)
+   gui.rebuild()
+   gui.screenshot('foo.png')
+   ```
+   replace with the single line:
+   ```python
+   qm.view(design)   # returns a matplotlib.figure.Figure, renders inline
+   ```
+   Same render path that GDS export uses — what you see is what you fab.
+   Works in Docker, Brev, Codespaces, any non-Qt environment.
+
+2. Run the workshop **outside Docker** on a machine with a display. Install
+   the dependencies locally:
+   ```bash
+   pip install 'quantum-metal[full]' sqdmetal
+   # plus install palace separately — see https://github.com/awslabs/palace
+   ```
+   Then open the notebooks in your local Jupyter — `MetalGUI(design)` will
+   open a window and `gui.rebuild()` / `gui.screenshot()` will work.
+
+   This costs you the Docker workflow but gains the interactive Qt GUI.
+   Native install also drops the ~2-3× QEMU slowdown on Apple Silicon.
+
 ### `gmsh-4.15.2.data` directory not empty on container startup
 
 If a previous `uv sync` was interrupted and you cleaned `.venv/` on the
