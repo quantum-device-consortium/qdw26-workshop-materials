@@ -7,7 +7,8 @@ The repository root defines the environment used by all workshops.
 - `Dockerfile`: system packages, Palace base image, Python runtime, and `uv`.
 - `pyproject.toml`: Python dependency requests that are installed into the shared environment.
 - `uv.lock`: locked Python resolution.
-- `compose.yaml`: local and Brev runtime entrypoint.
+- `compose.yaml`: local development runtime that can build from source.
+- `compose.deploy.yaml`: Brev/attendee runtime that pulls the published GHCR image.
 
 ## Dependency Policy
 
@@ -23,6 +24,10 @@ ghcr.io/quantum-device-consortium/qdw-workshop-materials
 
 CI publishes `main` and `sha-<shortsha>` tags after successful builds on `main`.
 The image contains the shared environment and the repository materials at `/home/ubuntu/qdw-workshop-materials`.
+
+Use `compose.deploy.yaml` when the goal is to run the same image that CI published. Use `compose.yaml` when actively developing or testing Dockerfile changes.
+
+Deployment security notes live in `docs/deployment-security.md`.
 
 ## Smoke Checks
 

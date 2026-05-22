@@ -1,0 +1,15 @@
+services:
+  dev:
+    image: ${QDW_IMAGE:-ghcr.io/quantum-device-consortium/qdw-workshop-materials:main}
+    platform: ${QDW_DOCKER_PLATFORM:-linux/amd64}
+    working_dir: /home/ubuntu/qdw-workshop-materials
+    init: true
+    ports:
+      - "${QDW_JUPYTER_BIND:-127.0.0.1}:8888:8888"
+    environment:
+      QISKIT_METAL_HEADLESS: "1"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    command: ["sleep", "infinity"]

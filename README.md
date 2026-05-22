@@ -4,10 +4,10 @@ Joint workspace for Quantum Device Workshop materials and the shared environment
 
 ## What Lives Here
 
-- `Dockerfile`, `compose.yaml`, `pyproject.toml`, `uv.lock`: shared runtime environment.
+- `Dockerfile`, `compose.yaml`, `compose.deploy.yaml`, `pyproject.toml`, `uv.lock`: shared runtime environment.
 - `workshops/`: self-contained workshop folders, each with a `workshop.yaml` manifest.
 - `shared/`: examples and files intended for more than one workshop.
-- `docs/`: attendee, workshop lead, Brev, and environment notes.
+- `docs/`: attendee, workshop lead, Brev, environment, and deployment security notes.
 - `scripts/`: validation, smoke-test, and Brev setup helpers.
 
 ## Quick Start
@@ -25,6 +25,12 @@ Then choose an interface:
 - VS Code or Cursor: attach to the running `dev` container.
 - SSH on Brev: connect to the instance, then use Docker Compose from the repo checkout.
 
+Brev/attendee deployments should use the published image:
+
+```bash
+docker compose -f compose.deploy.yaml up -d
+```
+
 ## Current Workshops
 
 - `workshops/quantum-device-design/`: Qiskit Metal, Palace, and SQDMetal tutorial materials.
@@ -38,6 +44,7 @@ python scripts/validate_workshops.py
 python scripts/check_notebooks.py
 bash -n scripts/*.sh
 docker compose config
+docker compose -f compose.deploy.yaml config
 ```
 
 If Docker is running locally, also build and smoke-test the image:
@@ -48,3 +55,4 @@ docker run --rm qdw-workshop-materials:local python scripts/smoke_environment.py
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/workshop-lead-guide.md](docs/workshop-lead-guide.md) for the workflow for adding or updating workshop materials.
+See [docs/deployment-security.md](docs/deployment-security.md) for deployment security expectations.

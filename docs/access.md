@@ -7,10 +7,12 @@ The attendee environment should be usable from several entry points. None of the
 Use JupyterLab for notebook-first workshops:
 
 ```bash
-docker compose exec dev uv run jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
+docker compose -f compose.deploy.yaml exec dev uv run jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
 ```
 
 Open the URL printed by JupyterLab.
+
+The compose files bind port `8888` to localhost by default. Use Brev's authenticated access or an SSH tunnel for remote access unless the deployment owner intentionally sets `QDW_JUPYTER_BIND=0.0.0.0`.
 
 ## VS Code Or Cursor
 
@@ -26,8 +28,8 @@ Use SSH on Brev or another remote host when terminal access is the most direct r
 
 ```bash
 cd qdw-workshop-materials
-docker compose up -d
-docker compose exec dev bash
+docker compose -f compose.deploy.yaml up -d
+docker compose -f compose.deploy.yaml exec dev bash
 ```
 
 ## Local Terminal

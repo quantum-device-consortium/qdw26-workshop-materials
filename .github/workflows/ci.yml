@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Validate
@@ -30,3 +33,6 @@ jobs:
 
       - name: Validate Docker Compose
         run: docker compose config
+
+      - name: Validate deployment Docker Compose
+        run: docker compose -f compose.deploy.yaml config
