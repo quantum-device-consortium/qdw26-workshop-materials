@@ -13,7 +13,7 @@ dependencies = [
     "mistune>=3.2.1",
     "nbconvert>=7.17.1",
     "notebook>=7.5.6",
-    "quantum-metal>=0.7.1",
+    "quantum-metal[full]>=0.7.1",
     "sqdmetal",
     "urllib3>=2.7.0",
 ]
