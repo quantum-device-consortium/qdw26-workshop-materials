@@ -173,6 +173,41 @@ with a display.
    This costs you the Docker workflow but gains the interactive Qt GUI.
    Native install also drops the ~2-3× QEMU slowdown on Apple Silicon.
 
+### `palace --version` exits with "Illegal instruction" on Apple Silicon
+
+```
+/home/abhis/spack/opt/spack/linux-zen2/palace-.../bin/palace: line 179:
+   157 Illegal instruction     $MPIRUN $PALACE $CONFIG
+subprocess.CalledProcessError: Command '['palace', '--version']'
+   returned non-zero exit status 132.
+```
+
+Exit 132 = SIGILL. The Palace binary in the base image is spack-built for
+`linux-zen2` — AMD Zen2 microarchitecture, which uses AVX2 instructions
+that QEMU's x86_64 emulator on Apple Silicon does not fully support. The
+binary crashes the moment it executes one.
+
+What this means for the workshop:
+
+- Notebook 1 (`intro_to_layout.ipynb`) — pure Metal layout, unaffected.
+- Notebooks 2 & 3 (`transmon_resonator.ipynb`, `qubit_qubit_coupling.ipynb`)
+  — the design / mesh / `qm.view()` parts all work, but the actual Palace
+  eigenmode / capacitance solve step will SIGILL.
+- Notebook 4 — depends on what design you build.
+
+**Fixes:**
+
+1. **Run the solves on a native amd64 host.** Brev's Linux/x86 instances,
+   any Intel/AMD Linux box, or an Intel Mac all have native AVX2 and run
+   Palace at full speed. The workshop's published Brev path is the
+   intended end-to-end flow.
+2. **Local-only iteration:** do layout work on your M-series Mac (notebook
+   1, plus the layout cells of 2 & 3), then push the design to a Brev
+   instance for the Palace solve.
+
+Native amd64 Linux / Intel Mac / Brev users are unaffected — Palace runs
+normally there.
+
 ### `gmsh-4.15.2.data` directory not empty on container startup
 
 If a previous `uv sync` was interrupted and you cleaned `.venv/` on the
