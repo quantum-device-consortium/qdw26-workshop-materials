@@ -13,11 +13,14 @@ dependencies = [
     "mistune>=3.2.1",
     "nbconvert>=7.17.1",
     "notebook>=7.5.6",
-    "quantum-metal",
+    "quantum-metal>=0.7.1",
     "sqdmetal",
     "urllib3>=2.7.0",
 ]
 
 [tool.uv.sources]
 sqdmetal = { git = "https://github.com/sqdlab/SQDMetal.git" }
-quantum-metal = { git = "https://github.com/abhishekchak52/qiskit-metal.git", branch = "gui-import-isolation"}
+# quantum-metal — was pinned to abhishekchak52/qiskit-metal@gui-import-isolation,
+# a pre-release fork that's now mainline as quantum-metal v0.7.0+. Pulling from
+# PyPI now; see PR description for full upstream changes (lite-flip, qm.view()
+# headless viewer, friendly missing-dep errors, etc).
