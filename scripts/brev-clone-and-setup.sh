@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_url="${QDW_REPO_URL:-git@github.com:quantum-device-consortium/qdw-workshop-materials.git}"
-repo_dir="${QDW_REPO_DIR:-$HOME/qdw-workshop-materials}"
+repo_url="${QDW_REPO_URL:-https://github.com/quantum-device-consortium/qdw26-workshop-materials.git}"
+repo_dir="${QDW_REPO_DIR:-$HOME/qdw26-workshop-materials}"
 
 mkdir -p "$HOME/.ssh"
 known_hosts="$HOME/.ssh/known_hosts"
@@ -28,4 +28,4 @@ else
   git clone "$repo_url" "$repo_dir"
 fi
 
-bash "$repo_dir/scripts/brev-setup.sh"
+QDW_COMPOSE_FILE="${QDW_COMPOSE_FILE:-docker-compose.yml}" bash "$repo_dir/scripts/brev-setup.sh"

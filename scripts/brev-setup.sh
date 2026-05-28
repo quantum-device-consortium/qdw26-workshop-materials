@@ -3,9 +3,13 @@ set -euo pipefail
 
 repo_dir=""
 for candidate in \
+  "$HOME/qdw26-workshop-materials" \
   "$HOME/qdw-workshop-materials" \
+  "$HOME/workspace/qdw26-workshop-materials" \
   "$HOME/workspace/qdw-workshop-materials" \
+  "/home/ubuntu/qdw26-workshop-materials" \
   "/home/ubuntu/qdw-workshop-materials" \
+  "/home/ubuntu/workspace/qdw26-workshop-materials" \
   "/home/ubuntu/workspace/qdw-workshop-materials"; do
   if [[ -d "$candidate" ]]; then
     repo_dir="$candidate"
@@ -14,7 +18,7 @@ for candidate in \
 done
 
 if [[ -z "$repo_dir" ]]; then
-  repo_dir="$(find /home/ubuntu -maxdepth 3 -type d -name qdw-workshop-materials -print -quit 2>/dev/null || true)"
+  repo_dir="$(find /home/ubuntu -maxdepth 3 -type d \( -name qdw26-workshop-materials -o -name qdw-workshop-materials \) -print -quit 2>/dev/null || true)"
 fi
 
 if [[ -z "$repo_dir" ]]; then
