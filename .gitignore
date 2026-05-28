@@ -16,6 +16,9 @@ wheels/
 todo.md
 attendee-instructions.md
 
+# Avoid redistributing paper PDFs unless redistribution rights are explicit.
+workshops/**/references/*.pdf
+
 # Local credentials and machine-specific deployment settings
 .env
 .env.*

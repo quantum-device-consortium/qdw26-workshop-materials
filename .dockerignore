@@ -6,6 +6,7 @@ __pycache__/
 .DS_Store
 todo.md
 attendee-instructions.md
+workshops/**/references/*.pdf
 .env
 .env.*
 !.env.example

@@ -12,7 +12,8 @@ Additional notebooks:
 - `notebooks/project.ipynb`
 - `notebooks/qubit_qubit_coupling.ipynb`
 
-Supporting files are in `assets/` and `references/`.
+Supporting files are in `assets/` and `references/`. Reference papers should
+be cited or linked unless redistribution rights are explicit.
 
 ## Overview
 

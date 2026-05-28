@@ -17,7 +17,6 @@ notebooks:
   - notebooks/transmon_resonator.ipynb
 assets:
   - assets/1.jpg
-  - references/Barends et al, Nature 2014.pdf
 python_dependencies:
   - jupyter
   - quantum-metal

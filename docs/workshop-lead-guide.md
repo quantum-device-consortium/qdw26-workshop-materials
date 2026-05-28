@@ -40,6 +40,8 @@ Use `entrypoints` for the notebooks attendees should open first. Use `smoke_comm
 
 - Use relative paths inside notebooks.
 - Keep large generated outputs out of the repo when practical.
+- Cite or link reference papers instead of committing PDFs unless redistribution
+  rights are explicit.
 - Put reusable examples in `shared/` only when more than one workshop needs them.
 - Put workshop-only helper files inside the workshop folder.
 
