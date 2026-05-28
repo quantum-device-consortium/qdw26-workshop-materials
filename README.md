@@ -39,6 +39,12 @@ Brev/attendee deployments should use the published image:
 docker compose -f compose.deploy.yaml up -d
 ```
 
+The repository is public so Brev can clone workshop materials without a deploy
+key. The attendee image is intended to be public at
+`ghcr.io/quantum-device-consortium/qdw-workshop-materials:main` so launchables
+can pull it without GHCR credentials. If the image is private, see
+[docs/brev.md](docs/brev.md) before creating attendee-facing launchables.
+
 ## Current Workshops
 
 - **`workshops/quantum-device-design/`** — 4-notebook progression covering the full Metal × SQDMetal × Palace flow:

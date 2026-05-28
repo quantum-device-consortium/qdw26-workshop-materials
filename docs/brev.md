@@ -2,6 +2,10 @@
 
 Brev hosts the remote compute instance. GitHub stores the workshop materials and Docker build definition. GitHub Container Registry stores the published workshop image.
 
+The current deployment target is a public GitHub repository plus a public
+GHCR image. That lets Brev clone the materials and pull the image without
+repository deploy keys or package tokens.
+
 The preferred deployment path is:
 
 1. Merge workshop updates into `main`.
@@ -27,12 +31,26 @@ Do not start or create instances until there is a clear test window and shutdown
 
 ## Secure Access
 
-The Brev instance may need two read-only credentials:
+For the current public-repo/public-image mode, Brev should not need GitHub
+credentials to clone the repository or pull the image.
 
-- GitHub repository access for cloning this private repository.
-- GHCR package access for pulling the private image, if the package is not public.
+Before making a launchable attendee-facing, verify both assumptions from a
+machine that is not logged in to GHCR:
 
-Recommended repository access is a read-only deploy key scoped only to this repository. A fine-grained GitHub token can also work for repository cloning, but it should be limited to repository read access.
+```bash
+git ls-remote https://github.com/quantum-device-consortium/qdw26-workshop-materials.git HEAD
+
+tmpdir="$(mktemp -d)"
+DOCKER_CONFIG="$tmpdir" docker manifest inspect ghcr.io/quantum-device-consortium/qdw-workshop-materials:main
+rm -rf "$tmpdir"
+```
+
+If the repository is made private again later, use a read-only deploy key
+scoped only to this repository. A fine-grained GitHub token can also work for
+repository cloning, but it should be limited to repository read access.
+
+If the GHCR image is private, Brev needs package read access for the pull.
+Prefer a short-lived token or Brev secret mechanism if available.
 
 Do not put long-lived credentials in notebooks, committed files, shell history, or attendee-facing docs.
 

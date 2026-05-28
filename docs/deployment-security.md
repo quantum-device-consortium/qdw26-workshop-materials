@@ -1,6 +1,6 @@
 # Deployment Security
 
-This repository is intended for a private workshop environment where attendees use a shared, prebuilt runtime without handling maintainer credentials.
+This repository is intended for a workshop environment where attendees use a shared, prebuilt runtime without handling maintainer credentials.
 
 ## Trust Boundaries
 
@@ -11,7 +11,13 @@ This repository is intended for a private workshop environment where attendees u
 
 ## Repository Access
 
-Use a read-only deploy key for Brev to clone this private repository. Scope the deploy key only to this repository and do not reuse it elsewhere.
+The current deployment mode uses a public GitHub repository so Brev can clone
+the materials without repository credentials. This is the simplest attendee
+path and keeps Brev setup reproducible.
+
+If the repository is made private again, use a read-only deploy key for Brev
+to clone it. Scope the deploy key only to this repository and do not reuse it
+elsewhere.
 
 A fine-grained GitHub token can be used for repository-clone testing, but it should be time-limited and restricted to the minimum required permissions:
 
@@ -23,11 +29,18 @@ Local-only planning notes and local credential files are ignored by both Git and
 
 ## GHCR Access
 
+The intended attendee deployment uses a public GHCR image so Brev and attendee
+machines can pull it without package credentials.
+
+Public image visibility means the image layers are public. Do not bake private
+workshop materials, secrets, license files, proprietary installers, or private
+datasets into the image.
+
 If the workshop image is private, Brev needs package read access to pull it. GitHub currently documents GHCR Docker authentication outside GitHub Actions with a personal access token classic that has `read:packages`. Prefer a short-lived token and a Brev secret mechanism if available.
 
 `scripts/brev-setup.sh` accepts `GHCR_USERNAME` and `GHCR_TOKEN` for image pulls. When those variables are used, the script writes Docker auth to a temporary Docker config directory and removes it before exiting. This avoids leaving package credentials in the Brev user's normal Docker configuration.
 
-If the image can be public without exposing private materials or licensing constraints, public GHCR pulls are operationally simpler. Keep the image private if it contains private workshop materials.
+Keep the image private if it contains private workshop materials or licensing constraints.
 
 ## Brev Runtime
 
