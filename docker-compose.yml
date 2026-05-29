@@ -4,8 +4,6 @@ services:
     platform: linux/amd64
     working_dir: /home/ubuntu/qdw-workshop-materials
     init: true
-    ports:
-      - "8888:8888"
     environment:
       QISKIT_METAL_HEADLESS: "1"
     cap_drop:
