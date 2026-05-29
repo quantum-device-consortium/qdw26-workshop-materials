@@ -31,6 +31,22 @@ Use `compose.deploy.yaml` when the goal is to run the same image that CI publish
 
 Deployment security notes live in `docs/deployment-security.md`.
 
+## Lifecycle
+
+Environment changes should follow this path:
+
+1. Workshop leads declare dependency needs in `workshop.yaml`.
+2. Maintainers update `Dockerfile`, `pyproject.toml`, and `uv.lock`.
+3. Pull request checks validate manifests, notebooks, Compose config, and smoke
+   tests.
+4. Merges to `main` publish the GHCR image.
+5. Maintainers create a fresh Brev workspace from the launchable and run the
+   Brev smoke checks before attendee use.
+
+The Brev launchable should usually remain stable. Update the launchable only
+when the repository URL, Compose file path, hardware profile, storage size, or
+intended access model changes.
+
 ## Smoke Checks
 
 Smoke checks should confirm the environment can start and workshops can be opened. They should not run long simulations in pull requests.

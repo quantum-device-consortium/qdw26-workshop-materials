@@ -2,6 +2,25 @@
 
 The attendee environment should be usable from several entry points. None of these paths is the only supported path.
 
+## Attendee Flow On Brev
+
+The intended attendee experience is to enter a prepared Brev workspace provided
+by the workshop organizers. Attendees should not need to choose hardware,
+configure Docker, or manage the launchable.
+
+The expected attendee flow is:
+
+1. Open the workspace or access link provided by the organizers.
+2. Sign in if the event access flow requires it.
+3. Choose an access path: browser terminal, SSH, VS Code/Cursor, JupyterLab,
+   or GUI forwarding when needed.
+4. Open the relevant folder under `workshops/`.
+5. Follow that workshop's `README.md`.
+
+If organizers merge repository changes after a workspace was created, attendees
+should use the refreshed workspace or update instructions provided by the
+organizers. Existing workspaces do not update automatically.
+
 ## JupyterLab
 
 Use JupyterLab for notebook-first workshops:

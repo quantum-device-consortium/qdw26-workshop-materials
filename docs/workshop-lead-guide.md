@@ -2,6 +2,22 @@
 
 Workshop leads should be able to add materials without learning the whole environment stack.
 
+## How Changes Reach Attendees
+
+Workshop materials move through this path:
+
+```text
+pull request -> CI checks -> merge to main -> published image -> fresh Brev workspace
+```
+
+The Brev launchable link is stable, but existing Brev workspaces do not update
+automatically. After a pull request is merged, maintainers should test a fresh
+workspace created from the launchable before telling attendees that the update
+is ready.
+
+Workshop leads should not edit the Brev launchable directly. They should make
+repository changes through pull requests.
+
 ## Add A Workshop
 
 Create a folder under `workshops/`:
@@ -48,3 +64,19 @@ Use `entrypoints` for the notebooks attendees should open first. Use `smoke_comm
 ## Dependency Requests
 
 Add dependency names to `workshop.yaml` first. Maintainers will update the shared root environment and lock files after checking compatibility with other workshops.
+
+## Pull Request Checklist
+
+Before requesting review:
+
+- Confirm every notebook and asset referenced by `workshop.yaml` exists.
+- Keep notebooks runnable from the repository root or the workshop folder using
+  relative paths.
+- Add fast `smoke_commands` that prove the workshop can start without running
+  long simulations.
+- Declare requested Python and system dependencies in `workshop.yaml`.
+- Run the local checks listed in `CONTRIBUTING.md` when practical.
+
+Maintainers will decide when dependency requests become part of the shared
+environment, because every added package affects all workshops and the attendee
+image.

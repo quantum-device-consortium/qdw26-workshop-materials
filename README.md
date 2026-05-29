@@ -90,3 +90,19 @@ docker run --rm qdw-workshop-materials:local python scripts/smoke_environment.py
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/workshop-lead-guide.md](docs/workshop-lead-guide.md) for the workflow for adding or updating workshop materials.
 See [docs/deployment-security.md](docs/deployment-security.md) for deployment security expectations.
 
+## Release Flow
+
+The repository is the source of truth for workshop materials and the shared
+environment. Workshop leads contribute through pull requests, GitHub Actions
+validates the repository and image, and Brev provides a reusable launchable
+for creating attendee workspaces from `main`.
+
+The launchable is a template, not a running environment. Organizers use it to
+create prepared workspaces from the repository and Docker Compose configuration
+on `main`. Existing Brev workspaces do not update automatically after a pull
+request is merged; they must be recreated from the launchable or updated
+manually.
+
+Before each workshop release, maintainers should create a fresh test workspace,
+run the smoke checks in [docs/brev.md](docs/brev.md), verify the advertised
+access paths, then stop or delete the test workspace.

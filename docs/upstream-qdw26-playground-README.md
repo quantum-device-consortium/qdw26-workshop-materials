@@ -62,7 +62,9 @@ Omit `--build` so Compose only pulls `image:` from the registry.
 
 Brev can run this repository as a **custom Docker container** so you get the same toolchain (Palace, uv, Qiskit Metal stack) on a cloud GPU instance.
 
-We have created a [custom launchable](https://brev.nvidia.com/launchable/deploy/now?launchableID=env-3Bva39JOzFWhrZdFqmmOEPfUd1j) on Brev. Deploy it using an instance of your choice. The default is 16vCPUs+16GB memory (**Note:** Remember that each vCPU is 1/2 of a physical CPU. This will be important when setting the `-np` parameter for palace later). 
+The upstream project used a Brev launchable with a default 16 vCPU / 16 GB
+memory instance. For the current workshop environment, use the deployment
+guidance in [brev.md](brev.md) rather than the historical upstream launchable.
 
 Open the instance in your editor (for example Cursor):
 
