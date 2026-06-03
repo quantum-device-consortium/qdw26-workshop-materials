@@ -2,7 +2,8 @@
 
 Most workshop activities work through JupyterLab, VS Code/Cursor, SSH
 terminals, and headless commands. GUI forwarding is optional and is mainly for
-desktop applications such as ParaView or Qt-based Quantum Metal tools.
+desktop applications such as ParaView, KLayout, or Qt-based Quantum Metal
+tools.
 
 If a GUI is not required, prefer the headless paths:
 

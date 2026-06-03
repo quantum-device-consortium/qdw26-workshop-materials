@@ -30,7 +30,8 @@ We will learn to:
 
 ## Requirements
 
-The shared repository environment installs Quantum Metal, SQDMetal, Palace, and
+The shared repository environment installs Quantum Metal, SQDMetal, Palace,
+Gmsh, ParaView, KLayout, SQuADDS, scqubits, scikit-rf, PyPalace, meshwell, and
 the supporting Python packages listed in the root environment files. Additional
 workshop-specific dependency requests should be declared in `workshop.yaml`.
 

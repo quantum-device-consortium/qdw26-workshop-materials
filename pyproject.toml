@@ -10,13 +10,18 @@ dependencies = [
     "jupyter>=1.1.1",
     "jupyter-server>=2.18.0",
     "jupyterlab>=4.5.7",
+    "klayout>=0.30.4",
+    "meshwell>=2.3.6",
     "mistune>=3.2.1",
     "nbconvert>=7.17.1",
     "notebook>=7.5.6",
     "pypalace==0.1.3",
     "quantum-metal[full]>=0.7.3",
     "schemdraw>=0.21",
+    "scikit-rf>=1.8.0",
+    "scqubits>=4.3.1",
     "sqdmetal",
+    "squadds>=0.3.6",
     "urllib3>=2.7.0",
 ]
 

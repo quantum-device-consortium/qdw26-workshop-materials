@@ -10,10 +10,15 @@ The repository root defines the environment used by all workshops.
 - `compose.yaml`: local development runtime that can build from source.
 - `compose.deploy.yaml`: hosted runtime that pulls the published GHCR image.
 
-Core system tools include Palace, Gmsh, and ParaView. Headless checks use
-ParaView's `pvpython` and `pvbatch` commands. The `paraview` GUI executable is
-available when users connect with a compatible display environment. See
-[GUI forwarding](gui-forwarding.md) for optional desktop-window setup.
+Core system tools include Palace, Gmsh, ParaView, and KLayout. Headless checks
+use ParaView's `pvpython` and `pvbatch` commands. The `paraview` and `klayout`
+GUI executables are available when users connect with a compatible display
+environment. See [GUI forwarding](gui-forwarding.md) for optional
+desktop-window setup.
+
+The shared Python environment also includes workshop design and analysis
+libraries such as Quantum Metal, SQDMetal, SQuADDS, scqubits, scikit-rf,
+PyPalace, meshwell, and KLayout's Python module.
 
 ## Dependency Policy
 

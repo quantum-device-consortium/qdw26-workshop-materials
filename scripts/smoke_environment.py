@@ -46,8 +46,16 @@ def main() -> int:
     run(["pvpython", "--version"])
     require_command("pvbatch")
     run(["pvbatch", "--version"])
+    require_command("klayout")
+    run(["klayout", "-v"])
     require_module("qiskit_metal")
     require_module("SQDMetal", "sqdmetal")
+    require_module("klayout")
+    require_module("meshwell")
+    require_module("pypalace")
+    require_module("skrf")
+    require_module("scqubits")
+    require_module("squadds")
 
     for workshop_dir in discover_workshop_dirs():
         manifest = parse_manifest(workshop_dir / "workshop.yaml")

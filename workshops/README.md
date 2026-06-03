@@ -1,6 +1,7 @@
 # Workshops
 
-Each workshop lives in its own folder and declares its entrypoints, dependencies, and smoke checks in `workshop.yaml`.
+Each workshop lives in its own folder and declares its entrypoints,
+dependencies, and smoke checks in `workshop.yaml`.
 
 ## Current Materials
 

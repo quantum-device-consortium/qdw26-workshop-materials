@@ -2,10 +2,12 @@
 FROM abhishekchak52/palace_env:latest
 
 # Runtime libs for PySide6 / Qt6 (X11, xcb, GL/EGL, fonts) — common import failures without these.
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 	git \
     gmsh \
+	klayout \
 	paraview \
+	python3-paraview \
 	libdbus-1-3 \
 	libdrm2 \
 	libegl1 \
