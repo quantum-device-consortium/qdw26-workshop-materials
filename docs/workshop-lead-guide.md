@@ -1,22 +1,29 @@
 # Workshop Lead Guide
 
-Workshop leads should be able to add materials without learning the whole environment stack.
+This guide describes how workshop leads add materials to the shared repository
+without needing to manage the full deployment stack.
 
-## How Changes Reach Attendees
+## Contribution Flow
 
 Workshop materials move through this path:
 
 ```text
-pull request -> CI checks -> merge to main -> published image -> fresh Brev workspace
+pull request -> CI checks -> merge to main -> published image -> Brev launchable
 ```
 
-The Brev launchable link is stable, but existing Brev workspaces do not update
-automatically. After a pull request is merged, maintainers should test a fresh
-workspace created from the launchable before telling attendees that the update
-is ready.
+Workshop leads contribute through pull requests. Maintainers review the
+materials, update the shared environment when needed, and validate a fresh
+workspace from the launchable before participant use.
 
-Workshop leads should not edit the Brev launchable directly. They should make
-repository changes through pull requests.
+Planned workshop tracks include:
+
+- Design layout.
+- EM simulations.
+- Hamiltonian and circuit analysis.
+- EM and circuit analysis.
+
+Each track should be represented by a self-contained workshop folder or a
+clearly documented section within an existing folder.
 
 ## Add A Workshop
 
@@ -35,7 +42,9 @@ Use a short lowercase slug, for example `quantum-device-design`.
 
 ## Fill Out The Manifest
 
-`workshop.yaml` is the handoff point between workshop leads and environment maintainers. It tells CI what to validate and tells maintainers which dependencies need to become part of the shared image.
+`workshop.yaml` is the handoff point between workshop content and environment
+maintenance. It tells CI what to validate and tells maintainers which
+dependencies need to become part of the shared image.
 
 Required fields:
 
@@ -50,7 +59,9 @@ Required fields:
 - `system_dependencies`
 - `smoke_commands`
 
-Use `entrypoints` for the notebooks attendees should open first. Use `smoke_commands` for fast checks that prove the workshop can start, not for full simulations.
+Use `entrypoints` for the notebooks participants should open first. Use
+`smoke_commands` for fast checks that prove the workshop can start, not for
+full simulations.
 
 ## Keep Materials Portable
 
@@ -63,7 +74,14 @@ Use `entrypoints` for the notebooks attendees should open first. Use `smoke_comm
 
 ## Dependency Requests
 
-Add dependency names to `workshop.yaml` first. Maintainers will update the shared root environment and lock files after checking compatibility with other workshops.
+Add dependency names to `workshop.yaml` first. Maintainers will update the
+shared root environment and lock files after checking compatibility with other
+workshops.
+
+If a notebook can run in a lighter environment such as Google Colab, note that
+in the workshop README. If it requires Palace, GUI forwarding, or another
+Brev-specific capability, state that clearly so maintainers can test the right
+deployment path.
 
 ## Pull Request Checklist
 
@@ -77,6 +95,6 @@ Before requesting review:
 - Declare requested Python and system dependencies in `workshop.yaml`.
 - Run the local checks listed in `CONTRIBUTING.md` when practical.
 
-Maintainers will decide when dependency requests become part of the shared
-environment, because every added package affects all workshops and the attendee
+Maintainers decide when dependency requests become part of the shared
+environment because every added package affects all workshops and the published
 image.

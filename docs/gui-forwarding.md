@@ -1,6 +1,8 @@
 # GUI Forwarding
 
-Most workshop activities should work through JupyterLab, VS Code/Cursor, SSH terminals, and headless commands. GUI forwarding is optional and is mainly for attendees or leads who want to open desktop applications such as ParaView or Qt-based Qiskit Metal tools from inside the workshop environment.
+Most workshop activities work through JupyterLab, VS Code/Cursor, SSH
+terminals, and headless commands. GUI forwarding is optional and is mainly for
+desktop applications such as ParaView or Qt-based Quantum Metal tools.
 
 If a GUI is not required, prefer the headless paths:
 
@@ -20,7 +22,8 @@ GUI forwarding has three pieces:
 - SSH or Docker display forwarding: a path from the container to that local display server.
 - Container environment variables: usually `DISPLAY`, and sometimes Xauthority settings.
 
-For workshop attendees, this is an advanced/optional setup. Workshop leads should test it before recommending it during live sessions.
+For participants, this is an advanced optional setup. Workshop leads should test
+it before relying on it during live sessions.
 
 ## macOS With XQuartz
 
@@ -47,7 +50,7 @@ docker compose up -d --build
 docker compose exec -e DISPLAY=host.docker.internal:0 dev paraview
 ```
 
-For the published attendee image:
+For the published image:
 
 ```bash
 docker compose -f compose.deploy.yaml up -d
@@ -125,7 +128,11 @@ ssh -Y user@remote-host
 echo "$DISPLAY"
 ```
 
-Then the container must be able to reach the SSH-forwarded display on the remote host. On Linux remote hosts this may require host networking or an Xauthority/socket mount. Because providers differ, workshop staff should test the exact Brev image and instance type before publishing GUI-forwarding instructions to attendees.
+Then the container must be able to reach the SSH-forwarded display on the remote
+host. On Linux remote hosts this may require host networking or an
+Xauthority/socket mount. Because providers differ, workshop staff should test
+the exact Brev image and instance type before publishing GUI-forwarding
+instructions.
 
 If this is not pre-tested, do not depend on GUI forwarding during a live workshop.
 

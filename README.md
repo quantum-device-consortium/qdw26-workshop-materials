@@ -1,74 +1,91 @@
 # QDW Workshop Materials
 
-Joint workspace for **Quantum Device Workshop** materials and the shared environment used by workshop attendees. End-to-end superconducting qubit chip design: **layout → simulation → analysis**, using only open-source tools.
+Shared workshop materials and runtime environment for the Quantum Device
+Workshop 2026.
 
-## The toolchain
+The environment supports layout, electromagnetic simulation, visualization, and
+circuit-analysis workflows using Quantum Metal, SQDMetal, Palace, pyPalace,
+Gmsh, ParaView, KLayout, SQuADDS, scqubits, scikit-rf, PyPalace, meshwell, and
+JupyterLab.
 
-- **[Quantum Metal](https://github.com/qiskit-community/qiskit-metal)** (formerly Qiskit Metal, v0.7.3): Python-first chip layout and design API. Defines transmons, resonators, CPW routing, and exports to GDS. Lite-by-default install since v0.7.0 — works headless in Docker / Colab / Brev / Codespaces. We use `quantum-metal[full]` here because the workshop exercises the GUI + meshing + EM pieces.
-- **[SQDMetal](https://github.com/sqdlab/SQDMetal)** (Sydney Quantum Design lab): integration layer that bridges Quantum Metal designs to open-source EM solvers — handles mesh generation, boundary conditions, post-processing.
-- **[Palace](https://github.com/awslabs/palace)** (AWS Labs): scalable open-source FEM solver for full-wave EM and eigenmode simulation. The numerical workhorse behind every simulation in this workshop. Comes pre-installed in the Docker base image (`abhishekchak52/palace_env`).
-- **[pyPalace](https://github.com/FirasAbouzahr/pyPalace)**: Python toolkit around Palace for building Palace configs, running FEM simulations, and quantum-device analysis (LOM, EPR). Exposes Palace's native configuration directly in Python, with meshing and Qiskit Metal integration for superconducting layouts.
-- **Analytical framework — Energy Participation Ratio (EPR)**: the method we use to extract qubit Hamiltonian parameters (frequencies, anharmonicities, dispersive shifts, cross-Kerr) from the EM eigenmodes Palace computes. Foundational paper: [Minev et al., *Energy-participation quantization of Josephson circuits*, npj Quantum Information (2021)](https://arxiv.org/abs/2010.00620). Quantum Metal's `EPRanalysis` class implements this; see also the [pyEPR-quantum](https://github.com/zlatko-minev/pyEPR) library.
+## Contents
 
-## What Lives Here
-
-- `Dockerfile`, `compose.yaml`, `compose.deploy.yaml`, `pyproject.toml`, `uv.lock`: shared runtime environment.
-- `workshops/`: self-contained workshop folders, each with a `workshop.yaml` manifest.
-- `shared/`: examples and files intended for more than one workshop.
-- `docs/`: attendee, workshop lead, Brev, environment, and deployment security notes.
-- `scripts/`: validation, smoke-test, and Brev setup helpers.
+- [Quick Start](#quick-start)
+- [Access Paths](#access-paths)
+- [Workshop Materials](#workshop-materials)
+- [Contributing](#contributing)
+- [Hosted Deployment](#hosted-deployment)
+- [Maintainer Checks](#maintainer-checks)
+- [AI Agent Setup Prompts](#ai-agent-setup-prompts)
 
 ## Quick Start
 
-Use whichever access path fits your workflow. All paths should point at the same checked-out materials and shared environment.
+Start the local Docker environment:
 
 ```bash
 docker compose up --build
 ```
 
-Then choose an interface:
-
-- JupyterLab: `docker compose exec dev uv run jupyter lab --ip 0.0.0.0 --port 8888 --no-browser`
-- Shell: `docker compose exec dev bash`
-- VS Code or Cursor: attach to the running `dev` container.
-- SSH on Brev: connect to the instance, then use Docker Compose from the repo checkout.
-- GUI tools: optional; see `docs/gui-forwarding.md` for display forwarding setup.
-
-Brev/attendee deployments should use the published image:
+Open a shell in the container:
 
 ```bash
-docker compose -f compose.deploy.yaml up -d
+docker compose exec dev bash
 ```
 
-The repository is public so Brev can clone workshop materials without a deploy
-key. The attendee image is intended to be public at
-`ghcr.io/quantum-device-consortium/qdw-workshop-materials:main` so launchables
-can pull it without GHCR credentials. If the image is private, see
-[docs/brev.md](docs/brev.md) before creating attendee-facing launchables.
+Start JupyterLab:
 
-## Current Workshops
+```bash
+docker compose exec dev uv run jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
+```
 
-- **`workshops/quantum-device-design/`** — 4-notebook progression covering the full Metal × SQDMetal × Palace flow:
-  1. `intro_to_layout.ipynb` — Quantum Metal basics: DesignPlanar, components, GDS export, `qm.view()`.
-  2. `transmon_resonator.ipynb` — capacitance + eigenmode simulation of a transmon coupled to a readout resonator, EPR analysis extracts qubit frequency / anharmonicity / dispersive shift.
-  3. `qubit_qubit_coupling.ipynb` — two-qubit chip with shared bus, eigenmode + EPR for the cross-Kerr.
-  4. `project.ipynb` — open-ended design challenge for attendees.
-  
-- **`workshops/electromagnetic-simulations/`** — 3-notebook progression covering the Metal × pyPalace × Palace flow:
-  1. `eigenmode_EPR.ipynb` — eigenmode simulation of a transmon coupled to a readout resonator with EPR analysis.
-  2. `electrostatic_LOM.ipynb` — electrostatic simulation of a transmon with capacitance extraction and LOM analysis.
-  3. `drive_resonator.ipynb` — frequency-domain simulation of a quarter-wavelength resonator with fitting to $|S_{21}|$.
+For hosted deployment testing, use the published image:
 
-  See [docs/access.md](docs/access.md) for how to run + troubleshooting (Apple Silicon notes, JupyterLab token gotchas, port collisions, …).
+```bash
+docker compose -f compose.deploy.yaml pull
+docker compose -f compose.deploy.yaml up -d --no-build
+```
 
-## Further reading on the analytical framework
+## Access Paths
 
-- **EPR (Energy Participation Ratio)** — Minev, Leghtas, et al., [*Energy-participation quantization of Josephson circuits*](https://arxiv.org/abs/2010.00620), npj Quantum Information **7**, 131 (2021). The method behind extracting Hamiltonian parameters from EM eigenmodes.
-- **EPR review / tutorial** — Minev, [*Energy participation approach to the design of quantum Josephson circuits*](https://arxiv.org/abs/2010.00620) — concept overview; explains why we care about modal participation ratios when designing real chips.
-- **Black-Box Quantization** — Nigg et al., [*Black-Box Superconducting Circuit Quantization*](https://arxiv.org/abs/1204.0587), PRL 108, 240502 (2012). Earlier framework that EPR generalises.
-- **Quantum Metal tutorials & docs** — [https://qiskit-community.github.io/qiskit-metal/](https://qiskit-community.github.io/qiskit-metal/) — the upstream package's full tutorial set, including 40+ notebooks covering qubit / resonator / route variants beyond what this workshop touches.
+Use whichever interface fits the session:
 
-## Contributor Checks
+- JupyterLab for notebooks.
+- VS Code or Cursor for editor-based work.
+- SSH or terminal for command-line work.
+- GUI forwarding for ParaView or Qt-based tools when a desktop window is needed.
+
+See [docs/access.md](docs/access.md) and
+[docs/gui-forwarding.md](docs/gui-forwarding.md).
+
+## Workshop Materials
+
+Current materials:
+
+- `workshops/quantum-device-design/`: Quantum Metal, SQDMetal, and Palace
+  notebooks.
+- `workshops/electromagnetic-simulations/`: Quantum Metal, pyPalace, and Palace
+  notebooks for eigenmode/EPR and electrostatic/LOM workflows.
+
+Planned additions:
+
+- Design layout.
+- Hamiltonian and circuit analysis.
+- EM and circuit analysis.
+
+Each workshop folder should include:
+
+```text
+workshops/<slug>/
+  README.md
+  workshop.yaml
+  notebooks/
+  assets/
+  references/
+```
+
+## Contributing
+
+Workshop leads should add or update materials through pull requests.
 
 Before opening a pull request:
 
@@ -80,29 +97,118 @@ docker compose config
 docker compose -f compose.deploy.yaml config
 ```
 
-If Docker is running locally, also build and smoke-test the image:
+See [CONTRIBUTING.md](CONTRIBUTING.md) and
+[docs/workshop-lead-guide.md](docs/workshop-lead-guide.md).
+
+## Hosted Deployment
+
+The Brev launchable is kept current through this repository and the published
+GHCR image:
+
+```text
+ghcr.io/quantum-device-consortium/qdw-workshop-materials:main
+```
+
+Participants will receive credit codes and launchable instructions through
+workshop channels. Participants should stop Brev workspaces when not in
+scheduled workshop sessions and delete them only after saving any needed work.
+Workspace configuration, credit-code distribution, and access details will be
+finalized separately before the workshop.
+
+Do not commit participant lists, access codes, credentials, or billing records.
+
+See [docs/brev.md](docs/brev.md),
+[docs/workspace-persistence.md](docs/workspace-persistence.md), and
+[docs/deployment-security.md](docs/deployment-security.md).
+
+## Maintainer Checks
+
+If Docker is running locally, build and smoke-test the image:
 
 ```bash
 docker build -t qdw-workshop-materials:local .
-docker run --rm qdw-workshop-materials:local python scripts/smoke_environment.py
+docker run --rm --platform linux/amd64 qdw-workshop-materials:local python scripts/smoke_environment.py
+docker run --rm --platform linux/amd64 \
+  -e QISKIT_METAL_HEADLESS=1 \
+  -e MPLBACKEND=Agg \
+  -e QT_QPA_PLATFORM=offscreen \
+  qdw-workshop-materials:local \
+  python scripts/run_workshop_execution.py
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/workshop-lead-guide.md](docs/workshop-lead-guide.md) for the workflow for adding or updating workshop materials.
-See [docs/deployment-security.md](docs/deployment-security.md) for deployment security expectations.
+Smoke checks confirm the environment starts. Workshop execution checks run the
+manifest-declared attendee notebooks and Python scripts inside the image. The
+execution check can take several minutes because it includes simulation
+notebooks.
 
-## Release Flow
+## AI Agent Setup Prompts
 
-The repository is the source of truth for workshop materials and the shared
-environment. Workshop leads contribute through pull requests, GitHub Actions
-validates the repository and image, and Brev provides a reusable launchable
-for creating attendee workspaces from `main`.
+<details>
+<summary>Copy-paste prompts for coding agents</summary>
 
-The launchable is a template, not a running environment. Organizers use it to
-create prepared workspaces from the repository and Docker Compose configuration
-on `main`. Existing Brev workspaces do not update automatically after a pull
-request is merged; they must be recreated from the launchable or updated
-manually.
+Use this repository context before making changes:
 
-Before each workshop release, maintainers should create a fresh test workspace,
-run the smoke checks in [docs/brev.md](docs/brev.md), verify the advertised
-access paths, then stop or delete the test workspace.
+```text
+You are working in the qdw26-workshop-materials repository.
+
+Goal:
+- Maintain a professional workshop repository for Quantum Device Workshop materials.
+- Keep the root environment shared across all workshops.
+- Keep each workshop self-contained under workshops/<slug>/.
+- Preserve support for JupyterLab, VS Code/Cursor, SSH, terminal, and optional GUI forwarding.
+
+Rules:
+- Do not commit credentials, participant lists, credit codes, billing data, license files, or private installer files.
+- Do not add long generated outputs unless explicitly needed.
+- Update workshop.yaml when adding notebooks, assets, dependencies, or smoke checks.
+- Run the validation checks before proposing a PR.
+
+Checks:
+python scripts/validate_workshops.py
+python scripts/check_notebooks.py
+bash -n scripts/*.sh
+docker compose config
+docker compose -f compose.deploy.yaml config
+```
+
+Codex:
+
+```text
+Please inspect this repository, update only the files needed for the requested
+change, preserve the workshop folder structure, run the validation checks, and
+summarize the result with file references.
+```
+
+Cursor:
+
+```text
+Use the repository README and docs as source of truth. Keep edits focused,
+update workshop.yaml for workshop content changes, and run the listed checks
+before suggesting a commit.
+```
+
+Claude:
+
+```text
+Review the repository structure first. Make concise, professional changes.
+Avoid adding private operational details to public docs. Validate manifests,
+notebooks, shell scripts, and Docker Compose before reporting completion.
+```
+
+Gemini:
+
+```text
+Help maintain this workshop repository. Keep root files for the shared
+environment, keep workshop materials under workshops/<slug>/, and verify changes
+with the README checks.
+```
+
+Antigravity:
+
+```text
+Use this repository as a workshop hub. When adding material, keep the workshop
+self-contained, declare dependencies in workshop.yaml, and avoid committing
+private event or billing information.
+```
+
+</details>

@@ -1,6 +1,7 @@
 # Contributing
 
-This repository is the shared workspace for workshop materials and the common attendee environment.
+This repository contains shared workshop materials and the common runtime
+environment.
 
 ## Workflow
 
@@ -33,7 +34,7 @@ Every workshop folder must include:
 
 - `README.md`: what the workshop covers and where to start.
 - `workshop.yaml`: manifest used by CI and the shared environment.
-- `notebooks/`: notebooks used by attendees.
+- `notebooks/`: notebooks used by participants.
 - `assets/`: images or small files used by the notebooks.
 - `references/`: papers, background material, and reading.
 
@@ -41,7 +42,9 @@ Workshop-specific legacy setup files can stay in the workshop folder. Shared too
 
 ## Dependencies
 
-Workshop leads should declare requested dependencies in `workshop.yaml`. Maintainers consolidate those requests into the shared `Dockerfile`, `pyproject.toml`, and `uv.lock` so attendees use one environment.
+Workshop leads should declare requested dependencies in `workshop.yaml`.
+Maintainers consolidate those requests into the shared `Dockerfile`,
+`pyproject.toml`, and `uv.lock` so all workshops use one environment.
 
 ## Access Paths
 

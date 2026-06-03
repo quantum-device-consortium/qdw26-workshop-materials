@@ -1,25 +1,26 @@
 # Access Paths
 
-The attendee environment should be usable from several entry points. None of these paths is the only supported path.
+The workshop environment supports several access paths. Each path uses the same
+repository checkout and shared runtime.
 
-## Attendee Flow On Brev
+## Hosted Workspace Flow
 
-The intended attendee experience is to enter a prepared Brev workspace provided
-by the workshop organizers. Attendees should not need to choose hardware,
-configure Docker, or manage the launchable.
+Participants using hosted compute should start from the workshop launchable and
+the event credit code provided by the organizers.
 
-The expected attendee flow is:
+Typical flow:
 
-1. Open the workspace or access link provided by the organizers.
-2. Sign in if the event access flow requires it.
-3. Choose an access path: browser terminal, SSH, VS Code/Cursor, JupyterLab,
+1. Open the launchable or access link distributed by the organizers.
+2. Sign in and apply the event credit code, if required.
+3. Create a workspace using the workshop-provided configuration.
+4. Choose an interface: browser terminal, SSH, VS Code/Cursor, JupyterLab,
    or GUI forwarding when needed.
-4. Open the relevant folder under `workshops/`.
-5. Follow that workshop's `README.md`.
+5. Open the relevant folder under `workshops/`.
+6. Follow that workshop's `README.md`.
 
-If organizers merge repository changes after a workspace was created, attendees
-should use the refreshed workspace or update instructions provided by the
-organizers. Existing workspaces do not update automatically.
+Workspace access instructions, participant lists, and credit-code distribution
+are handled through event-approved channels and are not stored in this
+repository.
 
 ## JupyterLab
 
@@ -31,11 +32,14 @@ docker compose -f compose.deploy.yaml exec dev uv run jupyter lab --ip 0.0.0.0 -
 
 Open the URL printed by JupyterLab.
 
-The compose files bind port `8888` to localhost by default. Use Brev's authenticated access or an SSH tunnel for remote access unless the deployment owner intentionally sets `QDW_JUPYTER_BIND=0.0.0.0`.
+The Compose files bind port `8888` to localhost by default. Use Brev's
+authenticated access or an SSH tunnel for remote access unless the deployment
+owner intentionally sets `QDW_JUPYTER_BIND=0.0.0.0`.
 
 ## VS Code Or Cursor
 
-Use an editor when you want a full project tree, terminals, and notebook support in one place.
+Use an editor for a full project tree, terminals, and notebook support in one
+place.
 
 1. Start the environment with `docker compose up -d --build`.
 2. Attach the editor to the running `dev` container.
@@ -43,7 +47,8 @@ Use an editor when you want a full project tree, terminals, and notebook support
 
 ## SSH
 
-Use SSH on Brev or another remote host when terminal access is the most direct route:
+Use SSH on Brev or another remote host when terminal access is the most direct
+route:
 
 ```bash
 cd qdw-workshop-materials
@@ -53,7 +58,9 @@ docker compose -f compose.deploy.yaml exec dev bash
 
 ## GUI Applications
 
-GUI applications are optional and need a display server on the attendee's local machine. Use `pvpython`, `pvbatch`, notebooks, or terminal workflows when possible; use GUI forwarding only when a desktop window is actually needed.
+GUI applications are optional and require a display server on the local
+machine. Use `pvpython`, `pvbatch`, notebooks, or terminal workflows when
+possible; use GUI forwarding only when a desktop window is required.
 
 See [GUI forwarding](gui-forwarding.md) for macOS, Linux, Windows, and remote-host setup notes.
 
@@ -77,8 +84,8 @@ All paths use the same repository checkout and shared environment.
 The base image `abhishekchak52/palace_env:latest` is **amd64-only** (no
 arm64 variant). On Apple Silicon, Docker must run it under QEMU emulation.
 
-`compose.yaml` pins `platform: linux/amd64` to make this consistent —
-**don't remove that line**. Without it, `uv sync` inside the container
+`compose.yaml` pins `platform: linux/amd64` to make this consistent.
+Without it, `uv sync` inside the container
 detects the host arch (arm64) but the container itself is emulated amd64,
 producing the cryptic build failure:
 
@@ -101,8 +108,7 @@ Jupyter Server 2.18.2 is running at:
 ```
 
 Those literal three dots are **JupyterLab masking the token** in log
-output (security default in 2.x). The token is NOT `...` — that's just
-what you see in the terminal.
+output. The token is not `...`.
 
 To get the real token, read JupyterLab's runtime json directly:
 
@@ -122,14 +128,14 @@ docker compose exec dev uv run jupyter lab \
 
 ### Browser shows the wrong file tree at `localhost:8888`
 
-**Symptom:** you open `http://localhost:8888/?token=...` and instead of
+**Symptom:** opening `http://localhost:8888/?token=...` shows an unrelated
+project instead of
 seeing `workshops/quantum-device-design/notebooks/` you see some
 unrelated project's files.
 
-**Cause:** you already have a JupyterLab running locally on port 8888
-(e.g. from a `jupyter lab` you started in another terminal hours ago).
-macOS routes `localhost:8888` to the local process before the
-Docker-port-mapped one.
+**Cause:** another JupyterLab process is already running locally on port 8888.
+macOS routes `localhost:8888` to the local process before the Docker-mapped
+one.
 
 Two fixes:
 
@@ -153,14 +159,12 @@ WARNING: xcb-cursor0 or libxcb-cursor0 is needed to load the Qt xcb platform plu
 INFO: Could not load the Qt platform plugin "xcb"
 ```
 
-The Docker container has **no X server / display** — the Qt-based `MetalGUI`
-class cannot work here. The workshop notebooks (`transmon_resonator.ipynb`,
-`qubit_qubit_coupling.ipynb`) were originally written for a local install
-with a display.
+The Docker container has no X server or display by default. The Qt-based
+`MetalGUI` class needs GUI forwarding or a local desktop environment.
 
-**Three paths forward, in order of effort:**
+Recommended options:
 
-1. **(Recommended)** Use the headless viewer instead. Anywhere you see:
+1. Use the headless viewer instead. Anywhere you see:
    ```python
    gui = MetalGUI(design)
    gui.rebuild()
@@ -170,15 +174,14 @@ with a display.
    ```python
    qm.view(design)   # returns a matplotlib.figure.Figure, renders inline
    ```
-   Same render path that GDS export uses — what you see is what you fab.
-   Works in Docker, Brev, Codespaces, any non-Qt environment.
+   This uses the same render path as GDS export and works in Docker, Brev,
+   Codespaces, and other non-Qt environments.
 
 2. Set up GUI forwarding to your laptop's display server (XQuartz on macOS,
    native X11 on Linux, VcXsrv/X410 on Windows). See [gui-forwarding.md](gui-forwarding.md)
    for the full setup. Once forwarding is connected, launch the notebook
-   server with `DISPLAY` passed through and `MetalGUI(design)` will open
-   a real Qt window on your laptop. Best for workshop leads who want the
-   full interactive GUI without leaving Docker.
+   server with `DISPLAY` passed through and `MetalGUI(design)` will open a Qt
+   window on the local machine.
 
 3. Run the workshop **outside Docker** on a machine with a display. Install
    the dependencies locally:
@@ -189,8 +192,7 @@ with a display.
    Then open the notebooks in your local Jupyter — `MetalGUI(design)` will
    open a window and `gui.rebuild()` / `gui.screenshot()` will work.
 
-   This costs you the Docker workflow but gains the interactive Qt GUI.
-   Native install also drops the ~2-3× QEMU slowdown on Apple Silicon.
+   This trades the Docker workflow for native GUI behavior.
 
 ### `palace --version` exits with "Illegal instruction" on Apple Silicon
 
@@ -206,7 +208,7 @@ Exit 132 = SIGILL. The Palace binary in the base image is spack-built for
 that QEMU's x86_64 emulator on Apple Silicon does not fully support. The
 binary crashes the moment it executes one.
 
-What this means for the workshop:
+Impact:
 
 - Notebook 1 (`intro_to_layout.ipynb`) — pure Metal layout, unaffected.
 - Notebooks 2 & 3 (`transmon_resonator.ipynb`, `qubit_qubit_coupling.ipynb`)
@@ -218,14 +220,12 @@ What this means for the workshop:
 
 1. **Run the solves on a native amd64 host.** Brev's Linux/x86 instances,
    any Intel/AMD Linux box, or an Intel Mac all have native AVX2 and run
-   Palace at full speed. The workshop's published Brev path is the
-   intended end-to-end flow.
+   Palace at full speed.
 2. **Local-only iteration:** do layout work on your M-series Mac (notebook
    1, plus the layout cells of 2 & 3), then push the design to a Brev
    instance for the Palace solve.
 
-Native amd64 Linux / Intel Mac / Brev users are unaffected — Palace runs
-normally there.
+Native amd64 Linux, Intel Mac, and Brev users are unaffected.
 
 ### `gmsh-4.15.2.data` directory not empty on container startup
 
