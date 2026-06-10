@@ -30,3 +30,25 @@ smoke_commands:
   - test -f notebooks/02_first_chip_layout.ipynb
   - python -c "import importlib.util; assert importlib.util.find_spec('qiskit_metal') is not None"
   - python -c "import importlib.util; assert importlib.util.find_spec('SQDMetal') is not None or importlib.util.find_spec('sqdmetal') is not None"
+execution_targets:
+  - path: notebooks/01_welcome.ipynb
+    kind: notebook
+    timeout_seconds: 600
+  - path: notebooks/02_first_chip_layout.ipynb
+    kind: notebook
+    timeout_seconds: 900
+  - path: notebooks/03_transmon_and_resonator.ipynb
+    kind: notebook
+    timeout_seconds: 1800
+  - path: notebooks/04_qubit_qubit_coupling.ipynb
+    kind: notebook
+    timeout_seconds: 1800
+  - path: notebooks/05_project.ipynb
+    kind: notebook
+    timeout_seconds: 600
+  - path: notebooks/solutions/05_project_layout.ipynb
+    kind: notebook
+    timeout_seconds: 900
+  - path: notebooks/solutions/05_project_solution_simulations.ipynb
+    kind: notebook
+    timeout_seconds: 2400

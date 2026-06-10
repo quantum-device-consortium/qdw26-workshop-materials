@@ -17,10 +17,29 @@ Typical flow:
    or GUI forwarding when needed.
 5. Open the relevant folder under `workshops/`.
 6. Follow that workshop's `README.md`.
+7. Stop the workspace when not in a scheduled workshop session.
 
 Workspace access instructions, participant lists, and credit-code distribution
 are handled through event-approved channels and are not stored in this
 repository.
+
+Use the prebuilt GHCR image for hosted workspaces. Do not rebuild the workshop
+image during participant startup:
+
+```bash
+cd ~/qdw26-workshop-materials
+bash scripts/brev-setup.sh
+```
+
+For a same-workspace resume when no image update has been announced:
+
+```bash
+cd ~/qdw26-workshop-materials
+QDW_PULL_IMAGE=0 bash scripts/brev-setup.sh
+```
+
+See [workspace persistence](workspace-persistence.md) for stop/start and
+state-preservation guidance.
 
 ## JupyterLab
 
@@ -32,14 +51,25 @@ docker compose -f compose.deploy.yaml exec dev uv run jupyter lab --ip 0.0.0.0 -
 
 Open the URL printed by JupyterLab.
 
-The Compose files bind port `8888` to localhost by default. Use Brev's
-authenticated access or an SSH tunnel for remote access unless the deployment
-owner intentionally sets `QDW_JUPYTER_BIND=0.0.0.0`.
+The deploy Compose file starts the container service but does not start
+JupyterLab automatically. If the final Brev launchable provides an "Open
+Jupyter" button, the launchable must start the command above and expose port
+`8888` through Brev's authenticated proxy. Local deployments bind port `8888`
+to localhost by default; hosted launchables may set `QDW_JUPYTER_BIND=0.0.0.0`
+when required by the Brev proxy.
 
 ## VS Code Or Cursor
 
 Use an editor for a full project tree, terminals, and notebook support in one
 place.
+
+Hosted workspace:
+
+1. Start the environment with `bash scripts/brev-setup.sh`.
+2. Attach the editor to the running `dev` container.
+3. Open `/home/ubuntu/qdw-workshop-materials`.
+
+Local development:
 
 1. Start the environment with `docker compose up -d --build`.
 2. Attach the editor to the running `dev` container.
@@ -52,7 +82,7 @@ route:
 
 ```bash
 cd qdw-workshop-materials
-docker compose -f compose.deploy.yaml up -d
+bash scripts/brev-setup.sh
 docker compose -f compose.deploy.yaml exec dev bash
 ```
 

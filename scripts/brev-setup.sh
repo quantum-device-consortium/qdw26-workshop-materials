@@ -34,6 +34,7 @@ if ! command -v docker >/dev/null 2>&1; then
 fi
 
 compose_file="${QDW_COMPOSE_FILE:-compose.deploy.yaml}"
+pull_image="${QDW_PULL_IMAGE:-1}"
 run_smoke="${QDW_RUN_SMOKE:-1}"
 tmp_docker_config=""
 
@@ -57,10 +58,20 @@ else
   echo "GHCR_USERNAME/GHCR_TOKEN are not set; assuming the image is public or Docker is already authenticated."
 fi
 
-docker compose -f "$compose_file" pull
-docker compose -f "$compose_file" up -d
-docker compose -f "$compose_file" ps
+compose_cmd=(docker compose -f "$compose_file")
+
+echo "Using repository: $repo_dir"
+echo "Using Compose file: $compose_file"
+
+if [[ "$pull_image" == "1" ]]; then
+  "${compose_cmd[@]}" pull
+else
+  echo "Skipping image pull because QDW_PULL_IMAGE=$pull_image."
+fi
+
+"${compose_cmd[@]}" up -d --no-build
+"${compose_cmd[@]}" ps
 
 if [[ "$run_smoke" == "1" ]]; then
-  docker compose -f "$compose_file" exec -T dev python scripts/smoke_environment.py
+  "${compose_cmd[@]}" exec -T dev python scripts/smoke_environment.py
 fi

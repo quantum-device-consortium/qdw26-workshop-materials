@@ -1,0 +1,47 @@
+name: Workshop Execution
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  workshop-execution:
+    name: Workshop Execution
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      MPLBACKEND: Agg
+      QT_QPA_PLATFORM: offscreen
+      QISKIT_METAL_HEADLESS: "1"
+      QDW_PALACE_CPUS: "2"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t qdw-workshop-materials:ci .
+
+      - name: Execute workshop targets
+        run: |
+          mkdir -p benchmark-results
+          docker run --rm \
+            -e MPLBACKEND \
+            -e QT_QPA_PLATFORM \
+            -e QISKIT_METAL_HEADLESS \
+            -e QDW_PALACE_CPUS \
+            -v "$PWD/benchmark-results:/home/ubuntu/qdw-workshop-materials/benchmark-results" \
+            qdw-workshop-materials:ci \
+            python scripts/run_workshop_execution.py --output-dir benchmark-results
+
+      - name: Upload execution results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workshop-execution-results
+          path: benchmark-results/
+          if-no-files-found: ignore

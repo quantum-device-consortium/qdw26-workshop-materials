@@ -58,10 +58,27 @@ Required fields:
 - `python_dependencies`
 - `system_dependencies`
 - `smoke_commands`
+- `execution_targets`
 
 Use `entrypoints` for the notebooks participants should open first. Use
 `smoke_commands` for fast checks that prove the workshop can start, not for
 full simulations.
+
+Use `execution_targets` for attendee-facing notebooks or Python scripts that
+must run successfully in the workshop Docker image. CI executes these targets
+inside the image on pull requests and records timing/resource results.
+
+Example:
+
+```yaml
+execution_targets:
+  - path: notebooks/tutorial.ipynb
+    kind: notebook
+    timeout_seconds: 900
+  - path: scripts/demo.py
+    kind: python
+    timeout_seconds: 120
+```
 
 ## Keep Materials Portable
 
@@ -92,6 +109,7 @@ Before requesting review:
   relative paths.
 - Add fast `smoke_commands` that prove the workshop can start without running
   long simulations.
+- Add every attendee-facing notebook or Python script to `execution_targets`.
 - Declare requested Python and system dependencies in `workshop.yaml`.
 - Run the local checks listed in `CONTRIBUTING.md` when practical.
 

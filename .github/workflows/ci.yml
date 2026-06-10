@@ -20,7 +20,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.11"
+
+      - name: Run unit tests
+        run: python -m unittest discover tests
 
       - name: Validate workshop manifests
         run: python scripts/validate_workshops.py

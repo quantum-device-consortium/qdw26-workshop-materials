@@ -19,7 +19,10 @@ REQUIRED_FIELDS = {
     "python_dependencies",
     "system_dependencies",
     "smoke_commands",
+    "execution_targets",
 }
+
+EXECUTION_TARGET_KINDS = {"notebook", "python"}
 
 
 def parse_scalar(value: str) -> str:
@@ -154,6 +157,47 @@ def validate_manifest(workshop_dir: Path) -> list[str]:
             continue
         if not (workshop_dir / entry_path).exists():
             errors.append(f"{manifest_path}: missing entrypoint '{entry_path}'")
+
+    try:
+        execution_targets = as_list(manifest, "execution_targets")
+    except ValueError as exc:
+        errors.append(f"{manifest_path}: {exc}")
+        execution_targets = []
+
+    for target in execution_targets:
+        if not isinstance(target, dict):
+            errors.append(f"{manifest_path}: each execution target must be a mapping")
+            continue
+
+        target_path = target.get("path")
+        target_kind = target.get("kind")
+        if not isinstance(target_path, str):
+            errors.append(f"{manifest_path}: each execution target must include a path")
+            continue
+        if not isinstance(target_kind, str):
+            errors.append(f"{manifest_path}: each execution target must include a kind")
+            continue
+        if target_kind not in EXECUTION_TARGET_KINDS:
+            allowed = ", ".join(sorted(EXECUTION_TARGET_KINDS))
+            errors.append(f"{manifest_path}: execution target kind must be one of {allowed}: '{target_path}'")
+
+        target_file = workshop_dir / target_path
+        if not target_file.exists():
+            errors.append(f"{manifest_path}: missing execution target '{target_path}'")
+        if target_kind == "notebook" and target_file.suffix != ".ipynb":
+            errors.append(f"{manifest_path}: notebook execution target must end in .ipynb: '{target_path}'")
+        if target_kind == "python" and target_file.suffix != ".py":
+            errors.append(f"{manifest_path}: python execution target must end in .py: '{target_path}'")
+
+        timeout = target.get("timeout_seconds")
+        if timeout is not None:
+            try:
+                timeout_value = int(str(timeout))
+            except ValueError:
+                errors.append(f"{manifest_path}: timeout_seconds must be an integer: '{target_path}'")
+            else:
+                if timeout_value <= 0:
+                    errors.append(f"{manifest_path}: timeout_seconds must be positive: '{target_path}'")
 
     return errors
 

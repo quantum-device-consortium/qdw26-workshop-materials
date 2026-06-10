@@ -28,4 +28,4 @@ else
   git clone "$repo_url" "$repo_dir"
 fi
 
-QDW_COMPOSE_FILE="${QDW_COMPOSE_FILE:-docker-compose.yml}" bash "$repo_dir/scripts/brev-setup.sh"
+QDW_COMPOSE_FILE="${QDW_COMPOSE_FILE:-compose.deploy.yaml}" bash "$repo_dir/scripts/brev-setup.sh"

@@ -16,6 +16,8 @@
 - [ ] `docker compose config`
 - [ ] `docker compose -f compose.deploy.yaml config`
 - [ ] Docker image smoke test, if Docker is available locally
+- [ ] Workshop execution test, if Docker is available locally:
+      `docker run --rm qdw-workshop-materials:local python scripts/run_workshop_execution.py`
 
 ## Access Paths Considered
 
