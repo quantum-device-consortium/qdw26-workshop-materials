@@ -1,0 +1,33 @@
+slug: electromagnetic-simulations
+title: Electromagnetic Simulations with pyPalace
+leads:
+  - FirasAbouzahr
+  - sara-sussman
+summary: Qiskit Metal, Palace, and pyPalace tutorials for FEM simulation and quantum device analysis workflows.
+entrypoints:
+  - path: notebooks/eigenmode_EPR.ipynb
+    kind: notebook
+    description: Eigenmode simulation of a transmon coupled to a readout resonator with EPR analysis.
+  - path: notebooks/electrostatic_LOM.ipynb
+    kind: notebook
+    description: Electrostatic simulation with capacitance extraction and LOM analysis.
+notebooks:
+  - notebooks/eigenmode_EPR.ipynb
+  - notebooks/electrostatic_LOM.ipynb
+  - notebooks/drive_resonator.ipynb
+assets:
+  - assets/1.jpg
+python_dependencies:
+  - jupyter
+  - quantum-metal
+  - sqdmetal
+  - pypalace
+system_dependencies:
+  - gmsh
+  - palace
+smoke_commands:
+  - test -f notebooks/eigenmode_EPR.ipynb
+  - test -f notebooks/electrostatic_LOM.ipynb
+  - python -c "import importlib.util; assert importlib.util.find_spec('qiskit_metal') is not None"
+  - python -c "import importlib.util; assert importlib.util.find_spec('SQDMetal') is not None or importlib.util.find_spec('sqdmetal') is not None"
+  - python -c "import importlib.util; assert importlib.util.find_spec('pypalace') is not None"

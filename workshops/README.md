@@ -5,6 +5,7 @@ Each workshop lives in its own folder and declares its entrypoints, dependencies
 ## Current Materials
 
 - `quantum-device-design/`: Qiskit Metal, Palace, and SQDMetal tutorial materials.
+- `electromagnetic-simulations/`: Qiskit Metal, Palace, and pyPalace tutorial materials.
 
 ## Required Layout
 

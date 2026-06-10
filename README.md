@@ -7,6 +7,7 @@ Joint workspace for **Quantum Device Workshop** materials and the shared environ
 - **[Quantum Metal](https://github.com/qiskit-community/qiskit-metal)** (formerly Qiskit Metal, v0.7.3): Python-first chip layout and design API. Defines transmons, resonators, CPW routing, and exports to GDS. Lite-by-default install since v0.7.0 — works headless in Docker / Colab / Brev / Codespaces. We use `quantum-metal[full]` here because the workshop exercises the GUI + meshing + EM pieces.
 - **[SQDMetal](https://github.com/sqdlab/SQDMetal)** (Sydney Quantum Design lab): integration layer that bridges Quantum Metal designs to open-source EM solvers — handles mesh generation, boundary conditions, post-processing.
 - **[Palace](https://github.com/awslabs/palace)** (AWS Labs): scalable open-source FEM solver for full-wave EM and eigenmode simulation. The numerical workhorse behind every simulation in this workshop. Comes pre-installed in the Docker base image (`abhishekchak52/palace_env`).
+- **[pyPalace](https://github.com/FirasAbouzahr/pyPalace)**: Python toolkit around Palace for building Palace configs, running FEM simulations, and quantum-device analysis (LOM, EPR). Exposes Palace's native configuration directly in Python, with meshing and Qiskit Metal integration for superconducting layouts.
 - **Analytical framework — Energy Participation Ratio (EPR)**: the method we use to extract qubit Hamiltonian parameters (frequencies, anharmonicities, dispersive shifts, cross-Kerr) from the EM eigenmodes Palace computes. Foundational paper: [Minev et al., *Energy-participation quantization of Josephson circuits*, npj Quantum Information (2021)](https://arxiv.org/abs/2010.00620). Quantum Metal's `EPRanalysis` class implements this; see also the [pyEPR-quantum](https://github.com/zlatko-minev/pyEPR) library.
 
 ## What Lives Here
@@ -52,6 +53,11 @@ can pull it without GHCR credentials. If the image is private, see
   2. `transmon_resonator.ipynb` — capacitance + eigenmode simulation of a transmon coupled to a readout resonator, EPR analysis extracts qubit frequency / anharmonicity / dispersive shift.
   3. `qubit_qubit_coupling.ipynb` — two-qubit chip with shared bus, eigenmode + EPR for the cross-Kerr.
   4. `project.ipynb` — open-ended design challenge for attendees.
+  
+- **`workshops/electromagnetic-simulations/`** — 3-notebook progression covering the Metal × pyPalace × Palace flow:
+  1. `eigenmode_EPR.ipynb` — eigenmode simulation of a transmon coupled to a readout resonator with EPR analysis.
+  2. `electrostatic_LOM.ipynb` — electrostatic simulation of a transmon with capacitance extraction and LOM analysis.
+  3. `drive_resonator.ipynb` — frequency-domain simulation of a quarter-wavelength resonator with fitting to $|S_{21}|$.
 
   See [docs/access.md](docs/access.md) for how to run + troubleshooting (Apple Silicon notes, JupyterLab token gotchas, port collisions, …).
 
@@ -83,3 +89,4 @@ docker run --rm qdw-workshop-materials:local python scripts/smoke_environment.py
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/workshop-lead-guide.md](docs/workshop-lead-guide.md) for the workflow for adding or updating workshop materials.
 See [docs/deployment-security.md](docs/deployment-security.md) for deployment security expectations.
+
