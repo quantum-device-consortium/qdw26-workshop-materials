@@ -38,15 +38,22 @@ recreated by future image updates.
 
 ## Resume A Workspace
 
-After starting the workspace again:
+After a pause/resume or host reboot, nothing needs to be re-run.
+`compose.deploy.yaml` sets `restart: unless-stopped`, so the container and both
+services — JupyterLab (port `8888`) and the noVNC web desktop (port `6080`) —
+come back automatically. Just reopen the port `8888` / `6080` URLs. See
+[participant-quickstart.md](participant-quickstart.md) for the participant flow.
+
+The setup script is optional on resume. If you want to explicitly start the
+Compose service without re-pulling the image, you can still run:
 
 ```bash
 cd ~/qdw26-workshop-materials
 QDW_PULL_IMAGE=0 bash scripts/brev-setup.sh
 ```
 
-This starts the existing Compose service without rebuilding the image. If the
-organizers announce an updated workshop image, run the standard setup instead:
+If the organizers announce an updated workshop image, run the standard setup to
+pull it:
 
 ```bash
 cd ~/qdw26-workshop-materials

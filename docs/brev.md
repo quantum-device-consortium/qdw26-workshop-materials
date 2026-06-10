@@ -15,6 +15,10 @@ GitHub repository -> GitHub Actions -> GHCR image -> Brev launchable -> particip
 - Participants receive NVIDIA credit codes and launchable access instructions through workshop channels.
 - Participants create and manage their own Brev workspace from the launchable.
 
+For participant-facing steps (launch workspace, connect IDE, browser Jupyter,
+GUI desktop, pause/resume, save work), point participants to
+[participant-quickstart.md](participant-quickstart.md).
+
 ## Launchable Requirements
 
 The participant launchable should use the prebuilt image path:
@@ -23,6 +27,11 @@ The participant launchable should use the prebuilt image path:
 - Mode: Docker Compose
 - Compose file: `compose.deploy.yaml`
 - Image: `ghcr.io/quantum-device-consortium/qdw-workshop-materials:main`
+- Exposed ports: `8888` (JupyterLab) and `6080` (noVNC web desktop, `/vnc.html`)
+
+The launchable must expose ports `8888` and `6080`. Both services auto-start
+inside the container (`compose.deploy.yaml` runs `scripts/start-services.sh`
+under supervisor) — there is no manual Jupyter start to configure.
 
 Do not rebuild the image during participant startup. Use the GHCR image built
 from `main`, then start the environment with Compose.
@@ -37,12 +46,13 @@ The setup script defaults to `compose.deploy.yaml`, runs `docker compose pull`,
 starts the service with `docker compose up -d --no-build`, and runs the smoke
 check unless `QDW_RUN_SMOKE=0` is set.
 
-`compose.deploy.yaml` starts the workshop container service. JupyterLab,
-terminal, SSH, and editor access are then selected by the workspace user or by
-the launchable configuration. If the final Brev launchable should support a
-one-click JupyterLab button, configure the launchable to start JupyterLab with
-`--ip 0.0.0.0 --port 8888 --no-browser` and set `QDW_JUPYTER_BIND=0.0.0.0`
-only inside the authenticated Brev workspace.
+`compose.deploy.yaml` starts the workshop container service, which auto-starts
+both JupyterLab (port `8888`, tokenless by default) and the noVNC web desktop
+(port `6080`, `/vnc.html`). The launchable only needs to expose ports `8888` and
+`6080`; no one-click JupyterLab command or manual start is required. Terminal,
+SSH, and editor access remain available to the workspace user. Published ports
+bind to `${QDW_BIND:-127.0.0.1}` and are reached through Brev's authenticated
+proxy.
 
 Existing workspaces do not automatically receive repository or image updates.
 Final workshop testing should use a fresh workspace created from the launchable.
@@ -96,7 +106,9 @@ Before distributing participant instructions:
 5. Create a fresh Brev test workspace from the launchable.
 6. Run the smoke checks below.
 7. Run the workshop execution check inside the published image.
-8. Verify JupyterLab, terminal, and editor access paths.
+8. Verify JupyterLab (port `8888`) and the noVNC web desktop (port `6080`)
+   auto-start and are reachable, and that a pause→resume cycle brings both
+   services back automatically.
 9. Verify stop/start behavior for the selected Brev provider and workspace configuration.
 10. Confirm credit-code distribution, support plan, and participant stop reminders.
 

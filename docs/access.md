@@ -3,6 +3,12 @@
 The workshop environment supports several access paths. Each path uses the same
 repository checkout and shared runtime.
 
+> **Participants:** the simplest path is
+> [participant-quickstart.md](participant-quickstart.md). JupyterLab (port
+> `8888`) and a noVNC web desktop (port `6080`, `/vnc.html`) auto-start in the
+> workspace — there is nothing to launch by hand. The notes below are mainly for
+> maintainers and local development.
+
 ## Hosted Workspace Flow
 
 Participants using hosted compute should start from the workshop launchable and
@@ -13,8 +19,8 @@ Typical flow:
 1. Open the launchable or access link distributed by the organizers.
 2. Sign in and apply the event credit code, if required.
 3. Create a workspace using the workshop-provided configuration.
-4. Choose an interface: browser terminal, SSH, VS Code/Cursor, JupyterLab,
-   or GUI forwarding when needed.
+4. Choose an interface: browser JupyterLab (port `8888`), the noVNC web desktop
+   (port `6080`), browser terminal, SSH, or VS Code/Cursor.
 5. Open the relevant folder under `workshops/`.
 6. Follow that workshop's `README.md`.
 7. Stop the workspace when not in a scheduled workshop session.
@@ -43,20 +49,23 @@ state-preservation guidance.
 
 ## JupyterLab
 
-Use JupyterLab for notebook-first workshops:
+JupyterLab auto-starts inside the container. Both `compose.yaml` (dev) and
+`compose.deploy.yaml` (attendee) run `scripts/start-services.sh`, which launches
+JupyterLab on port `8888` (and the noVNC web desktop on port `6080`) under
+supervisor. There is no manual `jupyter lab` command to run.
 
-```bash
-docker compose -f compose.deploy.yaml exec dev uv run jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
-```
+Just open the port-`8888` URL. JupyterLab is tokenless by default — access is
+gated by the Brev workspace proxy. To set a token anyway, provide the
+`QDW_JUPYTER_TOKEN` environment variable.
 
-Open the URL printed by JupyterLab.
+Both published ports bind to `${QDW_BIND:-127.0.0.1}` by default; hosted
+launchables expose `8888` (and `6080`) through Brev's authenticated proxy.
 
-The deploy Compose file starts the container service but does not start
-JupyterLab automatically. If the final Brev launchable provides an "Open
-Jupyter" button, the launchable must start the command above and expose port
-`8888` through Brev's authenticated proxy. Local deployments bind port `8888`
-to localhost by default; hosted launchables may set `QDW_JUPYTER_BIND=0.0.0.0`
-when required by the Brev proxy.
+## noVNC Web Desktop
+
+A noVNC web desktop also auto-starts on port `6080` at path `/vnc.html`. Open it
+in a browser to reach GUI applications (Terminal, KLayout, ParaView) without a
+local X server. See [GUI forwarding](gui-forwarding.md).
 
 ## VS Code Or Cursor
 
@@ -81,18 +90,20 @@ Use SSH on Brev or another remote host when terminal access is the most direct
 route:
 
 ```bash
-cd qdw-workshop-materials
+cd qdw26-workshop-materials
 bash scripts/brev-setup.sh
 docker compose -f compose.deploy.yaml exec dev bash
 ```
 
 ## GUI Applications
 
-GUI applications are optional and require a display server on the local
-machine. Use `pvpython`, `pvbatch`, notebooks, or terminal workflows when
-possible; use GUI forwarding only when a desktop window is required.
+The recommended way to open GUI apps (KLayout, the Quantum Metal GUI, ParaView)
+is the built-in noVNC web desktop on port `6080` (`/vnc.html`) — open it in a
+browser and right-click the desktop for Terminal/KLayout/ParaView. No local X
+server is required. X11-over-SSH forwarding remains available as a secondary
+path for power users who want native windows.
 
-See [GUI forwarding](gui-forwarding.md) for macOS, Linux, Windows, and remote-host setup notes.
+See [GUI forwarding](gui-forwarding.md) for the web desktop and X11/SSH setup notes.
 
 ## Local Terminal
 
@@ -128,40 +139,16 @@ Expect a ~2–3× slowdown vs native on Apple Silicon (unavoidable until the
 base image ships a multi-arch manifest). Native Linux / Intel Mac users
 are unaffected by the pin.
 
-### JupyterLab token shows as `...` in the log
+### JupyterLab does not need a token
 
-When JupyterLab starts it prints:
-
-```
-Jupyter Server 2.18.2 is running at:
-    http://127.0.0.1:8888/lab?token=...
-```
-
-Those literal three dots are **JupyterLab masking the token** in log
-output. The token is not `...`.
-
-To get the real token, read JupyterLab's runtime json directly:
-
-```bash
-docker compose exec dev bash -c \
-  'cat /home/ubuntu/.local/share/jupyter/runtime/jpserver-*.json' | grep token
-```
-
-Or start JupyterLab with an **explicit known token** (avoids the lookup):
-
-```bash
-docker compose exec dev uv run jupyter lab \
-  --ip 0.0.0.0 --port 8888 --no-browser \
-  --IdentityProvider.token=mytoken
-# then in browser: http://localhost:8888/?token=mytoken
-```
+JupyterLab is tokenless by default — open the port-`8888` URL directly with no
+token or password. Access is gated by the Brev workspace proxy. If you set
+`QDW_JUPYTER_TOKEN`, append `?token=<value>` to the URL.
 
 ### Browser shows the wrong file tree at `localhost:8888`
 
-**Symptom:** opening `http://localhost:8888/?token=...` shows an unrelated
-project instead of
-seeing `workshops/quantum-device-design/notebooks/` you see some
-unrelated project's files.
+**Symptom:** opening `http://localhost:8888/` shows an unrelated project instead
+of `workshops/quantum-device-design/notebooks/`.
 
 **Cause:** another JupyterLab process is already running locally on port 8888.
 macOS routes `localhost:8888` to the local process before the Docker-mapped
@@ -175,10 +162,11 @@ lsof -i :8888 | grep -v COMMAND     # find the local PID
 kill <PID>
 # then hard-refresh browser
 
-# Option B: move Docker to a different host port (both can coexist)
-# edit compose.yaml: change "8888:8888" to "8889:8888"
-docker compose up -d --force-recreate
-# then open http://localhost:8889/?token=...
+# Option B: bind the container's published ports to a different host address.
+# Both compose files publish 8888 and 6080 on ${QDW_BIND:-127.0.0.1}; override
+# QDW_BIND to move them off the conflicting localhost:
+QDW_BIND=127.0.0.2 docker compose up -d --force-recreate
+# then open http://127.0.0.2:8888/
 ```
 
 ### `MetalGUI(design)` fails with "could not connect to display" / `xcb` errors
@@ -240,20 +228,23 @@ binary crashes the moment it executes one.
 
 Impact:
 
-- Notebook 1 (`intro_to_layout.ipynb`) — pure Metal layout, unaffected.
-- Notebooks 2 & 3 (`transmon_resonator.ipynb`, `qubit_qubit_coupling.ipynb`)
-  — the design / mesh / `qm.view()` parts all work, but the actual Palace
-  eigenmode / capacitance solve step will SIGILL.
-- Notebook 4 — depends on what design you build.
+- Notebooks 1 & 2 (`01_welcome.ipynb`, `02_first_chip_layout.ipynb`) — pure
+  Metal layout, unaffected.
+- Notebooks 3 & 4 (`03_transmon_and_resonator.ipynb`,
+  `04_qubit_qubit_coupling.ipynb`) — the design / mesh / `qm.view()` parts all
+  work, but the actual Palace eigenmode / capacitance solve step will SIGILL.
+  The same applies to the electromagnetic-simulations notebooks
+  (`eigenmode_EPR.ipynb`, `electrostatic_LOM.ipynb`).
+- Notebook 5 (`05_project.ipynb`) — depends on what design you build.
 
 **Fixes:**
 
 1. **Run the solves on a native amd64 host.** Brev's Linux/x86 instances,
    any Intel/AMD Linux box, or an Intel Mac all have native AVX2 and run
    Palace at full speed.
-2. **Local-only iteration:** do layout work on your M-series Mac (notebook
-   1, plus the layout cells of 2 & 3), then push the design to a Brev
-   instance for the Palace solve.
+2. **Local-only iteration:** do layout work on your M-series Mac (notebooks 1 &
+   2, plus the layout cells of 3 & 4), then push the design to a Brev instance
+   for the Palace solve.
 
 Native amd64 Linux, Intel Mac, and Brev users are unaffected.
 

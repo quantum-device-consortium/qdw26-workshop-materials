@@ -11,13 +11,24 @@ RUN set -eux; \
     test -x "$PALACE_BIN"; \
     runuser -u ubuntu -- "$PALACE_BIN" --version
 
-# Runtime libs for PySide6 / Qt6 (X11, xcb, GL/EGL, fonts) — common import failures without these.
+# Runtime libs for PySide6 / Qt6 (X11, xcb, GL/EGL, fonts) — common import failures
+# without these — plus a lightweight in-browser desktop (TigerVNC + fluxbox + noVNC)
+# so attendees can open GUI apps (KLayout, the Qiskit Metal GUI) from a browser tab
+# during the design project without any local X server. Managed by supervisor.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 	git \
     gmsh \
 	klayout \
 	paraview \
 	python3-paraview \
+	supervisor \
+	tigervnc-standalone-server \
+	tigervnc-common \
+	fluxbox \
+	novnc \
+	websockify \
+	xterm \
+	dbus-x11 \
 	libdbus-1-3 \
 	libdrm2 \
 	libegl1 \
@@ -73,8 +84,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=.python-version,target=.python-version \
     uv python install \
     && python_path="$(uv python find --managed-python --no-project "$(cat .python-version)")" \
-    && uv sync --locked --no-install-project --python "$python_path" \
-    && uv pip uninstall debugpy
+    && uv sync --locked --no-install-project --python "$python_path"
+# NOTE: debugpy is intentionally kept (it ships transitively via ipykernel). It is
+# what lets attendees set breakpoints / use the VS Code & Cursor debuggers against
+# the kernel in this container, so it must NOT be uninstalled.
 
 # Copy workshop materials after dependency installation so dependency layers stay cacheable.
 COPY --chown=ubuntu:ubuntu . /home/ubuntu/qdw-workshop-materials

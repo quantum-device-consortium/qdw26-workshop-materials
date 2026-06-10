@@ -1,11 +1,28 @@
 # GUI Forwarding
 
 Most workshop activities work through JupyterLab, VS Code/Cursor, SSH
-terminals, and headless commands. GUI forwarding is optional and is mainly for
-desktop applications such as ParaView, KLayout, or Qt-based Quantum Metal
-tools.
+terminals, and headless commands. When you do need a desktop application such as
+ParaView, KLayout, or the Qt-based Quantum Metal GUI, there are two paths.
 
-If a GUI is not required, prefer the headless paths:
+## Recommended: noVNC Web Desktop (port 6080)
+
+The built-in noVNC web desktop is the recommended way to run GUI apps. It
+auto-starts inside the container on port `6080` at path `/vnc.html` — no local X
+server (XQuartz / VcXsrv) is needed.
+
+1. Open port `6080` for your workspace and go to `/vnc.html` (for example
+   `http://localhost:6080/vnc.html` if you port-forwarded), then click
+   **Connect**.
+2. **Right-click the desktop background** for the menu: **Terminal**,
+   **KLayout**, and **ParaView**.
+3. To open the Quantum Metal Qt GUI, use a desktop **Terminal** and launch it
+   from Python — the window appears on the web desktop.
+
+The X11/SSH-forwarding sections below are the secondary "native windows / power
+user" alternative for those who want GUI windows on their own machine instead of
+in the browser.
+
+If a GUI is not required at all, prefer the headless paths:
 
 ```bash
 pvpython --version
@@ -15,9 +32,15 @@ python scripts/smoke_environment.py
 
 The `paraview` GUI executable is installed in the image, but it needs a display server. In a plain SSH, Docker, or Brev terminal, running `paraview` without display forwarding will usually fail with a Qt or `xcb` display error.
 
-## What Has To Be Connected
+## Alternative: X11 / SSH Forwarding (native windows)
 
-GUI forwarding has three pieces:
+The rest of this document covers X11/SSH forwarding for native windows on your
+own machine. Use it only if you prefer native windows over the noVNC web desktop
+above.
+
+### What Has To Be Connected
+
+X11 forwarding has three pieces:
 
 - Local display server: software on your laptop that can show Linux GUI windows.
 - SSH or Docker display forwarding: a path from the container to that local display server.
@@ -116,9 +139,12 @@ If Windows Firewall prompts you, allow the X server on private networks only.
 
 For remote Docker hosts, there are two supported patterns.
 
-### Preferred: Use Headless Tools Remotely
+### Preferred: noVNC Web Desktop or Headless Tools Remotely
 
-Use JupyterLab, VS Code/Cursor remote access, SSH terminals, `pvpython`, and `pvbatch`. This is more reliable for workshop-scale use and avoids local display setup.
+Use the noVNC web desktop (port `6080`, `/vnc.html`) for GUI apps, plus
+JupyterLab, VS Code/Cursor remote access, SSH terminals, `pvpython`, and
+`pvbatch`. This is more reliable for workshop-scale use and avoids local display
+setup.
 
 ### Advanced: SSH X11 Forwarding
 

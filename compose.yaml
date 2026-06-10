@@ -18,6 +18,19 @@ services:
     working_dir: /home/ubuntu/qdw-workshop-materials
     volumes:
       - .:/home/ubuntu/qdw-workshop-materials
+    ports:
+      # Same ports as the attendee deploy so maintainers can test the real
+      # experience locally: JupyterLab + the noVNC web desktop.
+      - "${QDW_BIND:-127.0.0.1}:8888:8888"
+      - "${QDW_BIND:-127.0.0.1}:6080:6080"
     environment:
       QISKIT_METAL_HEADLESS: "1"
-    command: ["sh", "-c", "uv sync --locked && exec sleep infinity"]
+      QT_QPA_PLATFORM: offscreen
+      MPLBACKEND: Agg
+      QDW_JUPYTER_TOKEN: "${QDW_JUPYTER_TOKEN:-}"
+      QDW_VNC_GEOMETRY: "${QDW_VNC_GEOMETRY:-1440x900}"
+    # `docker compose up` mirrors the attendee stack but against the live,
+    # bind-mounted materials: sync deps into the mounted tree, then start
+    # JupyterLab + the noVNC desktop. Use `docker compose run --rm dev bash`
+    # for a plain shell instead.
+    command: ["sh", "-c", "uv sync --locked && exec scripts/start-services.sh"]

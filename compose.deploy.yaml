@@ -4,12 +4,28 @@ services:
     platform: ${QDW_DOCKER_PLATFORM:-linux/amd64}
     working_dir: /home/ubuntu/qdw-workshop-materials
     init: true
+    # Bring the workspace back automatically after a Brev pause/resume or a host
+    # reboot, so attendees never have to re-run a command.
+    restart: unless-stopped
     ports:
-      - "${QDW_JUPYTER_BIND:-127.0.0.1}:8888:8888"
+      # JupyterLab. Bind to localhost by default; the Brev proxy exposes it.
+      - "${QDW_BIND:-127.0.0.1}:8888:8888"
+      # noVNC web desktop (KLayout / Qiskit Metal GUI in the browser).
+      - "${QDW_BIND:-127.0.0.1}:6080:6080"
     environment:
+      # Headless defaults for notebook kernels. The kernel itself also clears
+      # DISPLAY and forces offscreen Qt (see scripts/start-jupyter.sh); these are
+      # belt-and-suspenders so any process started in the container is headless
+      # by default while the noVNC desktop keeps its own DISPLAY=:1.
       QISKIT_METAL_HEADLESS: "1"
-    cap_drop:
-      - ALL
+      QT_QPA_PLATFORM: offscreen
+      MPLBACKEND: Agg
+      # Tokenless JupyterLab by default (access is gated by the Brev proxy).
+      # Set QDW_JUPYTER_TOKEN to require a token.
+      QDW_JUPYTER_TOKEN: "${QDW_JUPYTER_TOKEN:-}"
+      QDW_VNC_GEOMETRY: "${QDW_VNC_GEOMETRY:-1440x900}"
+    # Drop only the dangerous default capability while keeping what OpenMPI /
+    # the X server need. no-new-privileges still prevents setuid escalation.
     security_opt:
       - no-new-privileges:true
-    command: ["sleep", "infinity"]
+    command: ["/home/ubuntu/qdw-workshop-materials/scripts/start-services.sh"]

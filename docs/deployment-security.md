@@ -48,12 +48,20 @@ Keep the image private if it contains private workshop materials or licensing co
 
 Use `compose.deploy.yaml` for Brev deployments. It pulls the already-published image instead of rebuilding on the instance.
 
-The deployment compose file defaults to binding Jupyter on `127.0.0.1:8888`. Override `QDW_JUPYTER_BIND=0.0.0.0` only when the Brev access layer requires it and the instance is protected by Brev authentication or another access control layer.
+The deployment compose file defaults to binding the published ports —
+JupyterLab on `127.0.0.1:8888` and the noVNC web desktop on `127.0.0.1:6080` —
+to localhost. Override `QDW_BIND=0.0.0.0` only when the Brev access layer
+requires it and the instance is protected by Brev authentication or another
+access control layer. JupyterLab is tokenless by default (access is gated by
+the Brev proxy); set `QDW_JUPYTER_TOKEN` to require a token.
 
-The container drops Linux capabilities and uses `no-new-privileges` by default.
-Do not add privileged mode, Docker socket mounts, host filesystem mounts, or
-broad network exposure for hosted deployments unless there is a documented
-reason and review.
+The container runs as a non-root user with `no-new-privileges` enabled, so
+processes cannot gain privileges via setuid. (The previous `cap_drop: ALL` was
+removed because it broke OpenMPI/Palace and the X server the GUI desktop needs;
+`no-new-privileges` plus non-root execution is the retained hardening.) Do not
+add privileged mode, Docker socket mounts, host filesystem mounts, or broad
+network exposure for hosted deployments unless there is a documented reason and
+review.
 
 ## Participant Isolation
 

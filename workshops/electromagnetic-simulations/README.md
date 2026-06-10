@@ -12,10 +12,6 @@ Recommended notebooks (in order):
 1. [`notebooks/eigenmode_EPR.ipynb`](notebooks/eigenmode_EPR.ipynb) — eigenmode + EPR analysis
 2. [`notebooks/electrostatic_LOM.ipynb`](notebooks/electrostatic_LOM.ipynb) — electrostatic + LOM analysis
 
-Time-permitting:
-
-- [`notebooks/drive_resonator.ipynb`](notebooks/drive_resonator.ipynb) — frequency-domain resonator simulation and $|S_{21}|$ fitting
-
 Supporting files are in `assets/` and `references/`. Reference papers should
 be cited or linked unless redistribution rights are explicit.
 

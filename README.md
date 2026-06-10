@@ -19,25 +19,29 @@ Gmsh, ParaView, KLayout, SQuADDS, scqubits, scikit-rf, meshwell, and JupyterLab.
 
 ## Quick Start
 
-Start the local Docker environment:
+**Workshop participants:** you don't need anything below — start at
+[docs/participant-quickstart.md](docs/participant-quickstart.md). It walks
+through launching your cloud workspace and connecting via your IDE or the
+browser.
+
+**Local development / maintainers:** start the environment. `docker compose up`
+syncs dependencies and then auto-starts JupyterLab (port `8888`) and the noVNC
+web desktop (port `6080`):
 
 ```bash
 docker compose up --build
+# JupyterLab:   http://localhost:8888
+# Web desktop:  http://localhost:6080/vnc.html
 ```
 
-Open a shell in the container:
+For a plain shell instead of the service stack:
 
 ```bash
-docker compose exec dev bash
+docker compose run --rm dev bash
 ```
 
-Start JupyterLab:
-
-```bash
-docker compose exec dev uv run jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
-```
-
-For hosted deployment testing, use the published image:
+For hosted deployment testing, use the published image (same auto-started
+services):
 
 ```bash
 docker compose -f compose.deploy.yaml pull
@@ -48,13 +52,15 @@ docker compose -f compose.deploy.yaml up -d --no-build
 
 Use whichever interface fits the session:
 
-- JupyterLab for notebooks.
-- VS Code or Cursor for editor-based work.
+- JupyterLab (port `8888`) for notebooks.
+- VS Code or Cursor for editor-based work (attach to the `dev` container).
 - SSH or terminal for command-line work.
-- GUI forwarding for ParaView, KLayout, or Qt-based tools when a desktop window
-  is needed.
+- noVNC web desktop (port `6080`, `/vnc.html`) for ParaView, KLayout, or the
+  Qiskit Metal GUI in a browser tab — no local X server needed. X11-over-SSH
+  remains available for native windows.
 
-See [docs/access.md](docs/access.md) and
+See [docs/participant-quickstart.md](docs/participant-quickstart.md),
+[docs/access.md](docs/access.md), and
 [docs/gui-forwarding.md](docs/gui-forwarding.md).
 
 ## Workshop Materials

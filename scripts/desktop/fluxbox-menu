@@ -1,0 +1,14 @@
+[begin] (QDW Workshop Desktop)
+  [exec] (Terminal) {xterm -fa Monospace -fs 11 -e 'cd /home/ubuntu/qdw-workshop-materials && bash'}
+  [exec] (KLayout) {klayout}
+  [exec] (ParaView) {paraview}
+  [separator]
+  [submenu] (Tips)
+    [exec] (Open a layout in KLayout) {xterm -hold -e 'echo "Run:  klayout your_design.gds"; echo "or open KLayout above and File > Open."'}
+    [exec] (Qiskit Metal GUI) {xterm -hold -e 'cd /home/ubuntu/qdw-workshop-materials && echo "In this terminal:  python  then  from qiskit_metal import designs, MetalGUI; d=designs.DesignPlanar(); gui=MetalGUI(d)"; bash'}
+  [end]
+  [separator]
+  [workspaces] (Workspaces)
+  [config] (Configuration)
+  [restart] (Restart desktop)
+[end]
