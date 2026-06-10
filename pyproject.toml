@@ -20,12 +20,13 @@ dependencies = [
     "pyvista==0.45.2",
     "quantum-metal[full]>=0.7.3",
     "schemdraw>=0.21",
+    "scipy==1.13.1",
     "scikit-rf>=1.8.0",
     "scqubits>=4.3.1",
     "sqdmetal",
     "squadds>=0.3.6",
     "urllib3>=2.7.0",
-    "vtk==9.2.6",
+    "vtk==9.4.2",
 ]
 
 [tool.uv.sources]

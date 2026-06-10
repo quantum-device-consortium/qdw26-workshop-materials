@@ -169,6 +169,28 @@ def run_palace(command: list[str], cwd: Path, log_path: Path) -> None:
         )
 
 
+def install_sqdmetal_renderer_compat() -> None:
+    """Keep SQDMetal's geometry processor compatible with current Quantum Metal."""
+
+    from SQDMetal.Utilities import QUtilities
+    from SQDMetal.Utilities.GeometryProcessors import GeomQiskitMetal
+
+    current_renderer = GeomQiskitMetal.QiskitShapelyRenderer
+    if getattr(current_renderer, "_qdw_compat_renderer", False):
+        return
+
+    class QDWQiskitShapelyRenderer(current_renderer):
+        def __init__(self, *args, **kwargs):
+            if len(args) == 3 and args[1] is not None:
+                super().__init__(args[1], **kwargs)
+            else:
+                super().__init__(*args, **kwargs)
+
+    QDWQiskitShapelyRenderer._qdw_compat_renderer = True
+    GeomQiskitMetal.QiskitShapelyRenderer = QDWQiskitShapelyRenderer
+    QUtilities.QiskitShapelyRenderer = QDWQiskitShapelyRenderer
+
+
 def install_sqdmetal_palace_runner() -> None:
     """Use a deterministic Palace launcher for SQDMetal notebook runs.
 
@@ -178,6 +200,8 @@ def install_sqdmetal_palace_runner() -> None:
     SQDMetal's simulation preparation and result parsing intact, but replaces the
     process launch with a direct subprocess call to ``PALACE_BIN``.
     """
+
+    install_sqdmetal_renderer_compat()
 
     from SQDMetal.PALACE.Model import PALACE_Model_Base
 
@@ -210,3 +234,40 @@ def install_sqdmetal_palace_runner() -> None:
 
     _run_local._qdw_safe_runner = True
     PALACE_Model_Base._run_local = _run_local
+
+
+def install_pypalace_runner() -> None:
+    """Use the workshop Palace launcher for pyPalace simulations.
+
+    pyPalace normally starts Palace directly from the notebook kernel with
+    ``subprocess.Popen``. In the workshop container, launching MPI-heavy jobs
+    from a long-running notebook kernel can stall before the Palace process is
+    created. This hook keeps pyPalace's configuration and result parsing intact
+    while delegating the actual Palace process launch to the same isolated
+    helper used by the SQDMetal notebooks.
+    """
+
+    from pypalace import Simulation
+
+    current_runner = Simulation.run
+    if getattr(current_runner, "_qdw_safe_runner", False):
+        return
+
+    def _run(self, n, HPC_options=None, custom_script_name=None) -> None:
+        if HPC_options is not None:
+            return current_runner(self, n, HPC_options=HPC_options, custom_script_name=custom_script_name)
+
+        if self.config.saved is False:
+            self.config.save_config()
+
+        cwd = Path.cwd()
+        output_dir = Path(self.config.config["Problem"]["Output"])
+        output_dir.mkdir(parents=True, exist_ok=True)
+        log_path = output_dir / "out.log"
+        command = ["mpirun", "-n", str(n), self.path_to_palace, self.path_to_json]
+
+        run_palace(command, cwd, log_path)
+        print(f"Palace completed successfully. Log written to {log_path}.")
+
+    _run._qdw_safe_runner = True
+    Simulation.run = _run

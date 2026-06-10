@@ -29,3 +29,10 @@ smoke_commands:
   - python -c "import importlib.util; assert importlib.util.find_spec('qiskit_metal') is not None"
   - python -c "import importlib.util; assert importlib.util.find_spec('SQDMetal') is not None or importlib.util.find_spec('sqdmetal') is not None"
   - python -c "import importlib.util; assert importlib.util.find_spec('pypalace') is not None"
+execution_targets:
+  - path: notebooks/eigenmode_EPR.ipynb
+    kind: notebook
+    timeout_seconds: 2400
+  - path: notebooks/electrostatic_LOM.ipynb
+    kind: notebook
+    timeout_seconds: 2400
