@@ -29,6 +29,7 @@ jobs:
       - name: Execute workshop targets
         run: |
           mkdir -p benchmark-results
+          chmod 777 benchmark-results
           docker run --rm \
             -e MPLBACKEND \
             -e QT_QPA_PLATFORM \
