@@ -14,9 +14,7 @@ entrypoints:
 notebooks:
   - notebooks/eigenmode_EPR.ipynb
   - notebooks/electrostatic_LOM.ipynb
-  - notebooks/drive_resonator.ipynb
 assets:
-  - assets/1.jpg
 python_dependencies:
   - jupyter
   - quantum-metal
