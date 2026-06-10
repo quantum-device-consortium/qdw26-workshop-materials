@@ -2,7 +2,7 @@ slug: electromagnetic-simulations
 title: Electromagnetic Simulations with pyPalace
 leads:
   - FirasAbouzahr
-  - sara-sussman
+  - sarafs1926
 summary: Qiskit Metal, Palace, and pyPalace tutorials for FEM simulation and quantum device analysis workflows.
 entrypoints:
   - path: notebooks/eigenmode_EPR.ipynb
